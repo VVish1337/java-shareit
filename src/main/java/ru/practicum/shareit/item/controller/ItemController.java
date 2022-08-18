@@ -1,11 +1,11 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.controller;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.marker.Create;
+import ru.practicum.shareit.item.marker.Update;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.marker.Create;
-import ru.practicum.shareit.marker.Update;
 
 import java.util.List;
 
@@ -21,19 +21,14 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-//    @GetMapping
-//    public List<ItemDto> getItemsOfUser(@RequestHeader("X-Sharer-User-Id") long userId) {
-//        return itemService.getItemsOfUser(userId);
-//    }
-
     @GetMapping("/{itemId}")
     public ItemDto getItemById(@PathVariable long itemId) {
         return itemService.getItemById(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getItemList() {
-        return itemService.getItemList();
+    public List<ItemDto> getItemList(@RequestHeader(USER_ID_HEADER) long userId) {
+        return itemService.getItemList(userId);
     }
 
     @GetMapping("/search")
@@ -42,7 +37,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto saveItem(@RequestHeader(value = USER_ID_HEADER)
+    public ItemDto saveItem(@RequestHeader(USER_ID_HEADER)
                             long userId,
                             @RequestBody
                             @Validated(Create.class)
@@ -52,7 +47,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader(value = USER_ID_HEADER) long userId,
+    public ItemDto updateItem(@RequestHeader(USER_ID_HEADER) long userId,
                               @PathVariable long itemId,
                               @Validated(Update.class)
                               @RequestBody ItemDto itemDto) {

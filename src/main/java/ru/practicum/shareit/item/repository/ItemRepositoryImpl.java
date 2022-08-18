@@ -1,98 +1,83 @@
 package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
 
-    private final Map<Long,Item> items = new HashMap<>();
-    private final ItemMapper itemMapper;
+    private final Map<Long, Item> items = new HashMap<>();
     private long count = 1;
 
-    public ItemRepositoryImpl(ItemMapper itemMapper) {
-        this.itemMapper = itemMapper;
-    }
-
     @Override
-    public ItemDto save(long userId,ItemDto itemDto) {
-        Item item = itemMapper.dtoToItem(itemDto,userId);
+    public Item save(Item item) {
         item.setId(counter());
-        items.put(item.getId(),item);
-        return itemMapper.itemToDto(item);
+        items.put(item.getId(), item);
+        return item;
     }
 
     @Override
-    public ItemDto getItemById(long itemId) {
-        if(items.containsKey(itemId)){
-            return itemMapper.itemToDto(items.get(itemId));
-        }else{
-            throw new IllegalStateException("Item don't exists");
+    public Item getItemById(long itemId) {
+        if (items.containsKey(itemId)) {
+            return items.get(itemId);
+        } else {
+            throw new NotFoundException("Item with this id:"+itemId+" doesn't exists");
         }
     }
 
     @Override
-    public List<ItemDto> getItemsOfUser(long userId) {
-        List<ItemDto> itemsDtoList = new ArrayList<>();
-        for(Item item:items.values()){
-            if(item.getOwner()==userId){
-                itemsDtoList.add(itemMapper.itemToDto(item));
+    public List<Item> getItemList(long userId) {
+        List<Item> itemsList = new ArrayList<>();
+        for (Item item : items.values()) {
+            if (item.getOwner() == userId) {
+                itemsList.add(item);
             }
         }
-        return itemsDtoList;
+        return itemsList;
     }
 
     @Override
-    public List<ItemDto> getItemList() {
-        List<ItemDto> itemsDtoList = new ArrayList<>();
-        for(Item item:items.values()){
-            itemsDtoList.add(itemMapper.itemToDto(item));
+    public Item updateItem(long itemId, Item item) {
+        if (items.get(itemId).getOwner() != item.getOwner()) {
+            throw new NotFoundException("Wrong userId");
         }
-        System.out.println(items);
-        return itemsDtoList;
+        Item oldItem = items.get(itemId);
+        if (item.getName() != null) {
+            oldItem.setName(item.getName());
+        }
+        if (item.getDescription() != null) {
+            oldItem.setDescription(item.getDescription());
+        }
+        if (item.getAvailable() != null) {
+            oldItem.setAvailable(item.getAvailable());
+        }
+        items.put(oldItem.getId(), oldItem);
+        return oldItem;
     }
 
     @Override
-    public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
-        if(items.get(itemId).getOwner()!=userId){
-            throw new IllegalStateException("Wrong userId");
+    public List<Item> searchItem(String text) {
+        List<Item> itemsList = new ArrayList<>();
+        if (text.isBlank()) {
+            return itemsList;
         }
-        Item item = itemMapper.dtoToItem(getItemById(itemId),userId);
-        if(itemDto.getName()!=null){
-            item.setName(itemDto.getName());
-        }
-        if(itemDto.getDescription()!=null){
-            item.setDescription(itemDto.getDescription());
-        }
-        if(itemDto.getAvailable()!=null){
-            item.setAvailable(itemDto.getAvailable());
-        }
-        System.out.println(item);
-        items.put(item.getId(),item);
-        return itemMapper.itemToDto(item);
-    }
-
-    @Override
-    public List<ItemDto> searchItem(String text) {
-        Set<ItemDto> itemsDtoList = new HashSet<>();
-        for(Item item:items.values()){
-            if(item.getAvailable()){
-                if(item.getName().toLowerCase().contains(text.toLowerCase())){
-                    itemsDtoList.add(itemMapper.itemToDto(item));
-                }
-                if(item.getDescription().toLowerCase().contains(text.toLowerCase())){
-                    itemsDtoList.add(itemMapper.itemToDto(item));
-                }
+        for (Item item : items.values()) {
+            if ((item.getName().toLowerCase().contains(text.toLowerCase())
+                    || item.getDescription().toLowerCase().contains(text.toLowerCase()))
+                    && item.getAvailable()) {
+                itemsList.add(item);
             }
         }
-        return new ArrayList<>(itemsDtoList);
+        return itemsList;
     }
 
-    private long counter(){
+    private long counter() {
         return count++;
     }
 }

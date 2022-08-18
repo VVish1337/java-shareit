@@ -2,10 +2,6 @@ package ru.practicum.shareit.item.model;
 
 import lombok.*;
 
-/**
- * // TODO .
- */
-
 @Getter
 @Setter
 @ToString

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -14,44 +15,44 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final ItemMapper itemMapper;
+    private Item convertItem;
+    private List<Item> convertList;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository, ItemMapper itemMapper) {
+    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
-        this.itemMapper = itemMapper;
     }
 
     @Override
     public ItemDto saveItem(long userId, ItemDto itemDto) {
         userRepository.getUserById(userId);
-        return itemRepository.save(userId,itemDto);
+        convertItem = itemRepository.save(ItemMapper.dtoToItem(itemDto,userId));
+        return ItemMapper.itemToDto(convertItem);
     }
 
     @Override
     public ItemDto getItemById(long itemId) {
-        return itemRepository.getItemById(itemId);
+        convertItem = itemRepository.getItemById(itemId);
+        return ItemMapper.itemToDto(convertItem);
     }
 
     @Override
-    public List<ItemDto> getItemsOfUser(long userId) {
-        return itemRepository.getItemsOfUser(userId);
-    }
-
-    @Override
-    public List<ItemDto> getItemList() {
-        return itemRepository.getItemList();
+    public List<ItemDto> getItemList(long userId) {
+        convertList = itemRepository.getItemList(userId);
+        return ItemMapper.listItemToDtoList(convertList);
     }
 
     @Override
     public ItemDto updateItem(long userId,long itemId,ItemDto itemDto) {
         itemRepository.getItemById(itemId);
-        return itemRepository.updateItem(userId,itemId,itemDto);
+        convertItem = itemRepository.updateItem(itemId,ItemMapper.dtoToItem(itemDto,userId));
+        return ItemMapper.itemToDto(convertItem);
     }
 
     @Override
     public List<ItemDto> searchItem(String text) {
-        return itemRepository.searchItem(text);
+        convertList = itemRepository.searchItem(text);
+        return ItemMapper.listItemToDtoList(convertList);
     }
 }

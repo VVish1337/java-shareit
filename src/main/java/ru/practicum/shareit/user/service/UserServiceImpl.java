@@ -2,6 +2,8 @@ package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -11,6 +13,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private User convertUser;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
@@ -18,8 +21,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(User user) {
-        return userRepository.save(user);
+    public User save(UserDto userDto) {
+        convertUser = userRepository.save(UserMapper.userDtoToUser(userDto,0));
+        return convertUser;
     }
 
     @Override
@@ -33,10 +37,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(long userId, User user) {
+    public User updateUser(long userId, UserDto userDto) {
         getUserById(userId);
-        user.setId(userId);
-        return userRepository.updateUser(user);
+        convertUser = userRepository.updateUser(UserMapper.userDtoToUser(userDto,userId));
+        return convertUser;
     }
 
     @Override

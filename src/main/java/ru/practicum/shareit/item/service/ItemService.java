@@ -9,11 +9,9 @@ public interface ItemService {
 
     ItemDto getItemById(long itemId);
 
-    List<ItemDto> getItemsOfUser(long userId);
+    List<ItemDto> getItemList(long userId);
 
-    List<ItemDto> getItemList();
-
-    ItemDto updateItem(long userId,long itemId, ItemDto item);
+    ItemDto updateItem(long userId, long itemId, ItemDto item);
 
     List<ItemDto> searchItem(String text);
 }
