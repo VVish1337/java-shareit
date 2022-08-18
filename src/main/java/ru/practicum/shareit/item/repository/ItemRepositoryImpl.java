@@ -27,7 +27,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         if (items.containsKey(itemId)) {
             return items.get(itemId);
         } else {
-            throw new NotFoundException("Item with this id:"+itemId+" doesn't exists");
+            throw new NotFoundException("Item with this id:" + itemId + " doesn't exists");
         }
     }
 
