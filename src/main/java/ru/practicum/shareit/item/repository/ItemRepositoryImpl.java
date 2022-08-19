@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
@@ -33,13 +34,9 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> getItemList(long userId) {
-        List<Item> itemsList = new ArrayList<>();
-        for (Item item : items.values()) {
-            if (item.getOwner() == userId) {
-                itemsList.add(item);
-            }
-        }
-        return itemsList;
+        return items.values().stream()
+                .filter(item -> item.getOwner() == userId)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -63,18 +60,13 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> searchItem(String text) {
-        List<Item> itemsList = new ArrayList<>();
         if (text.isBlank()) {
-            return itemsList;
+            return new ArrayList<>();
         }
-        for (Item item : items.values()) {
-            if ((item.getName().toLowerCase().contains(text.toLowerCase())
-                    || item.getDescription().toLowerCase().contains(text.toLowerCase()))
-                    && item.getAvailable()) {
-                itemsList.add(item);
-            }
-        }
-        return itemsList;
+        return items.values().stream()
+                .filter(item -> (item.getName().toLowerCase().contains(text.toLowerCase())
+                        || item.getDescription().toLowerCase().contains(text.toLowerCase()))
+                        && item.getAvailable()).collect(Collectors.toList());
     }
 
     private long counter() {

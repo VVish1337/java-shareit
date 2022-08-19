@@ -39,18 +39,15 @@ public class ItemController {
     @PostMapping
     public ItemDto saveItem(@RequestHeader(USER_ID_HEADER)
                             long userId,
-                            @RequestBody
-                            @Validated(Create.class)
-                            ItemDto itemDto) {
+                            @RequestBody @Validated(Create.class) ItemDto itemDto) {
         System.out.println(userId);
-        return itemService.saveItem(userId,itemDto);
+        return itemService.saveItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@RequestHeader(USER_ID_HEADER) long userId,
                               @PathVariable long itemId,
-                              @Validated(Update.class)
-                              @RequestBody ItemDto itemDto) {
+                              @Validated(Update.class) @RequestBody ItemDto itemDto) {
         return itemService.updateItem(userId, itemId, itemDto);
     }
 }

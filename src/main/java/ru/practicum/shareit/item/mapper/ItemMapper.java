@@ -3,8 +3,8 @@ package ru.practicum.shareit.item.mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ItemMapper {
 
@@ -18,21 +18,16 @@ public class ItemMapper {
     }
 
     public static Item dtoToItem(ItemDto itemDto, long ownerId) {
-        Item item = new Item();
-        item.setId(itemDto.getId());
-        item.setName(itemDto.getName());
-        item.setDescription(itemDto.getDescription());
-        item.setAvailable(itemDto.getAvailable());
-        item.setOwner(ownerId);
-        return item;
+        return new Item(itemDto.getId(),
+                itemDto.getName(),
+                itemDto.getDescription(),
+                itemDto.getAvailable(),
+                ownerId);
     }
 
     public static List<ItemDto> listItemToDtoList(List<Item> items) {
-        List<ItemDto> itemsDtoList = new ArrayList<>();
-        for (Item item : items) {
-            ItemDto itemDto = itemToDto(item);
-            itemsDtoList.add(itemDto);
-        }
-        return itemsDtoList;
+        return items.stream()
+                .map(ItemMapper::itemToDto)
+                .collect(Collectors.toList());
     }
 }
