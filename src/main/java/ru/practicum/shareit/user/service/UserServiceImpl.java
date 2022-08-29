@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -10,9 +11,10 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
     private User convertUser;
 
     @Autowired
@@ -28,23 +30,36 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(long id) {
-        return userRepository.getUserById(id);
+        return userRepository.findById(id).orElseThrow();
     }
 
     @Override
     public List<User> getUsersList() {
-        return userRepository.getUsersList();
+        return userRepository.findAll();
     }
 
     @Override
     public User updateUser(long userId, UserDto userDto) {
         getUserById(userId);
-        convertUser = userRepository.updateUser(UserMapper.userDtoToUser(userDto,userId));
+        convertUser = updateUserData(UserMapper.userDtoToUser(userDto,userId));
+        userRepository.save(convertUser);
         return convertUser;
     }
 
     @Override
     public void deleteUser(long userId) {
-        userRepository.deleteUser(userId);
+        userRepository.deleteById(userId);
+    }
+
+
+        private User updateUserData(User user) {
+        User oldUser = getUserById(user.getId());
+        if (oldUser.getName() != null) {
+            oldUser.setName(user.getName());
+        }
+        if (oldUser.getEmail() != null) {
+            oldUser.setEmail(user.getEmail());
+        }
+        return oldUser;
     }
 }

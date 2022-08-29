@@ -26,7 +26,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto saveItem(long userId, ItemDto itemDto) {
-        userRepository.getUserById(userId);
+        userRepository.findById(userId);
         convertItem = itemRepository.save(ItemMapper.dtoToItem(itemDto,userId));
         return ItemMapper.itemToDto(convertItem);
     }
