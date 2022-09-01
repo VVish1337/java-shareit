@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -11,7 +11,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
@@ -30,7 +29,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(long id) {
-        return userRepository.findById(id).orElseThrow();
+        return userRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException("User not found"));
     }
 
     @Override
@@ -51,13 +51,12 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-
-        private User updateUserData(User user) {
+    private User updateUserData(User user) {
         User oldUser = getUserById(user.getId());
-        if (oldUser.getName() != null) {
+        if (user.getName() != null) {
             oldUser.setName(user.getName());
         }
-        if (oldUser.getEmail() != null) {
+        if (user.getEmail() != null) {
             oldUser.setEmail(user.getEmail());
         }
         return oldUser;

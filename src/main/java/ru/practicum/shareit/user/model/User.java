@@ -1,6 +1,9 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -8,16 +11,16 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@ToString
+@Entity
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "users")
 public class User {
     @Id
-    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id",nullable = false)
     private Long id;
-    @Column(name ="user_name")
+    @Column(name ="user_name",nullable = false)
     private String name;
     private String email;
 
