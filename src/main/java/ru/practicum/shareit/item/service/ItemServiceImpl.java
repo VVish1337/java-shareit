@@ -29,39 +29,59 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto saveItem(long userId, ItemDto itemDto) {
-        User user =userRepository.findById(userId)
-                .orElseThrow(()->new NotFoundException("User not found"));
-        convertItem = itemRepository.save(ItemMapper.dtoToItem(itemDto,user));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        convertItem = itemRepository.save(ItemMapper.dtoToItem(itemDto, user));
         return ItemMapper.itemToDto(convertItem);
     }
 
     @Override
     public ItemDto getItemById(long itemId) {
         convertItem = itemRepository.findById(itemId)
-                .orElseThrow(()->new NotFoundException("Item not found"));
+                .orElseThrow(() -> new NotFoundException("Item not found"));
         return ItemMapper.itemToDto(convertItem);
     }
 
     @Override
     public List<ItemDto> getItemList(long userId) {
         convertList = itemRepository.findAll().stream()
-                .filter(item->item.getOwner().getId().equals(userId))
+                .filter(item -> item.getOwner().getId().equals(userId))
                 .collect(Collectors.toList());
         return ItemMapper.listItemToDtoList(convertList);
     }
 
     @Override
-    public ItemDto updateItem(long userId,long itemId,ItemDto itemDto) {
+    public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
 //        itemRepository.getItemById(itemId);
 //        convertItem = itemRepository.updateItem(itemId,ItemMapper.dtoToItem(itemDto,userId));
-//        return ItemMapper.itemToDto(convertItem);
-        return null;
+//        return ItemMapper.itemToDto(convertItem)
+//        ;
+        Item oldItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        convertItem = (ItemMapper.dtoToItem(itemDto,user));
+        if(oldItem.getOwner().getId()!=userId){
+            throw new NotFoundException("");
+        }
+        if(convertItem.getName() != null) {
+            oldItem.setName(convertItem.getName());
+        }
+        if(convertItem.getDescription()!=null){
+            oldItem.setDescription(convertItem.getDescription());
+        }
+        if(convertItem.getAvailable()!=null){
+            oldItem.setAvailable(convertItem.getAvailable());
+        }
+        itemRepository.save(oldItem);
+        return ItemMapper.itemToDto(oldItem);
     }
 
     @Override
     public List<ItemDto> searchItem(String text) {
 //        convertList = itemRepository.findByText(text);
 //        return ItemMapper.listItemToDtoList(convertList);
+      //  itemRepository.se(text);
         return null;
     }
 }
