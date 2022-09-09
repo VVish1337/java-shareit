@@ -16,7 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 //    Item updateItem(long itemId, Item item);
 //
 //    List<Item> searchItem(String text);
-    @Query(" select i from items i " +
+    @Query("select i from Item i " +
             "where upper(i.name) like upper(concat('%', ?1, '%')) " +
             " or upper(i.description) like upper(concat('%', ?1, '%')) and i.available = true")
     List<Item> search(String text);

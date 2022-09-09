@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.controller;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.marker.Create;
 import ru.practicum.shareit.item.marker.Update;
@@ -22,8 +24,8 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId) {
-        return itemService.getItemById(itemId);
+    public ItemDto getItemById(@PathVariable long itemId,@RequestHeader(USER_ID_HEADER) long userId) {
+        return itemService.getItemById(itemId,userId);
     }
 
     @GetMapping
@@ -49,5 +51,12 @@ public class ItemController {
                               @PathVariable long itemId,
                               @Validated(Update.class) @RequestBody ItemDto itemDto) {
         return itemService.updateItem(userId, itemId, itemDto);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto createComment(@Validated({Create.class}) @RequestBody CreateCommentDto commentDto,
+                                    @PathVariable Long itemId,
+                                    @RequestHeader(USER_ID_HEADER) Long userId) {
+        return itemService.createComment(commentDto, itemId, userId);
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     private User convertUser;
 
     @Autowired
@@ -23,14 +23,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(UserDto userDto) {
-        convertUser = userRepository.save(UserMapper.userDtoToUser(userDto,0));
+        convertUser = userRepository.save(UserMapper.userDtoToUser(userDto, 0));
         return convertUser;
     }
 
     @Override
     public User getUserById(long id) {
         return userRepository.findById(id)
-                .orElseThrow(()-> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(long userId, UserDto userDto) {
         getUserById(userId);
-        convertUser = updateUserData(UserMapper.userDtoToUser(userDto,userId));
+        convertUser = updateUserData(UserMapper.userDtoToUser(userDto, userId));
         userRepository.save(convertUser);
         return convertUser;
     }

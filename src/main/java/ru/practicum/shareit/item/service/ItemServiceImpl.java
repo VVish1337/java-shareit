@@ -1,15 +1,25 @@
 package ru.practicum.shareit.item.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.exception.ItemUnavailableException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,13 +28,19 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
+    private final Sort sort = Sort.by("start").descending();
     private Item convertItem;
     private List<Item> convertList;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository) {
+    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository,
+                           BookingRepository bookingRepository, CommentRepository commentRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -36,10 +52,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItemById(long itemId) {
+    public ItemDto getItemById(long itemId, long userId) {
         convertItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found"));
-        return ItemMapper.itemToDto(convertItem);
+        List<Comment> comments = commentRepository.findByItemId(itemId);
+        if (convertItem.getOwner().getId().equals(userId)) {
+            return addBookingToItem(convertItem, LocalDateTime.now(), sort, comments);
+        }
+        return ItemMapper.itemToDto(convertItem, null, null, comments);
     }
 
     @Override
@@ -47,30 +67,28 @@ public class ItemServiceImpl implements ItemService {
         convertList = itemRepository.findAll().stream()
                 .filter(item -> item.getOwner().getId().equals(userId))
                 .collect(Collectors.toList());
-        return ItemMapper.listItemToDtoList(convertList);
+        return ItemMapper.listItemToDtoList(convertList).stream()
+                .map(item -> getItemById(item.getId(), userId))
+                .collect(Collectors.toList());
     }
 
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
-//        itemRepository.getItemById(itemId);
-//        convertItem = itemRepository.updateItem(itemId,ItemMapper.dtoToItem(itemDto,userId));
-//        return ItemMapper.itemToDto(convertItem)
-//        ;
         Item oldItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found"));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        convertItem = (ItemMapper.dtoToItem(itemDto,user));
-        if(oldItem.getOwner().getId()!=userId){
-            throw new NotFoundException("");
+        convertItem = (ItemMapper.dtoToItem(itemDto, user));
+        if (oldItem.getOwner().getId() != userId) {
+            throw new NotFoundException("Owner not found");
         }
-        if(convertItem.getName() != null) {
+        if (convertItem.getName() != null) {
             oldItem.setName(convertItem.getName());
         }
-        if(convertItem.getDescription()!=null){
+        if (convertItem.getDescription() != null) {
             oldItem.setDescription(convertItem.getDescription());
         }
-        if(convertItem.getAvailable()!=null){
+        if (convertItem.getAvailable() != null) {
             oldItem.setAvailable(convertItem.getAvailable());
         }
         itemRepository.save(oldItem);
@@ -79,9 +97,35 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItem(String text) {
-//        convertList = itemRepository.findByText(text);
-//        return ItemMapper.listItemToDtoList(convertList);
-      //  itemRepository.se(text);
-        return null;
+        if (text == null || text.isBlank()) {
+            return new ArrayList<>();
+        }
+        List<Item> foundItems = itemRepository.search(text);
+        return ItemMapper.listItemToDtoList(foundItems);
+    }
+
+    @Override
+    public CommentDto createComment(CreateCommentDto commentDto, Long itemId, Long userId) {
+        if (commentDto.getText().isBlank()) {
+            throw new NotFoundException("Comment text is blank");
+        }
+        Item item = itemRepository.findById(itemId).orElseThrow();
+        User author = userRepository.findById(userId).orElseThrow();
+        if (bookingRepository.findSuitableBookingsForComments(itemId, userId, LocalDateTime.now()).isEmpty()) {
+            throw new ItemUnavailableException("Booking items for comments not found");
+        }
+        Comment comment = ItemMapper.toModelComment(commentDto, item, author);
+        comment = commentRepository.save(comment);
+        return ItemMapper.toCommentDto(comment);
+    }
+
+    private ItemDto addBookingToItem(Item item, LocalDateTime now, Sort sort, List<Comment> comments) {
+        Booking lastBooking = bookingRepository
+                .findByItemIdAndEndBefore(item.getId(), now, sort).stream()
+                .findFirst().orElse(null);
+        Booking nextBooking = bookingRepository
+                .findByItemIdAndStartAfter(item.getId(), now, sort).stream()
+                .findFirst().orElse(null);
+        return ItemMapper.itemToDto(item, lastBooking, nextBooking, comments);
     }
 }

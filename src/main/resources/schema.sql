@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS items
     description  VARCHAR(512)                            NOT NULL,
     is_available BOOLEAN                                 NOT NULL,
     owner_id     BIGINT REFERENCES users (user_id)       NOT NULL,
-    request_id   BIGINT REFERENCES requests (request_id) NOT NULL,
     CONSTRAINT pk_item PRIMARY KEY (item_id)
 );
 
@@ -43,5 +42,6 @@ CREATE TABLE IF NOT EXISTS comments
     comment_text VARCHAR(255)                            NOT NULL,
     item_id      BIGINT REFERENCES items (item_id)       NOT NULL,
     author_id    BIGINT REFERENCES users (user_id)       NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     CONSTRAINT pk_comments PRIMARY KEY (comment_id)
 );
