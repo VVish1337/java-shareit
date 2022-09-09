@@ -1,9 +1,13 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.*;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemUnavailableException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnsupportedStatusException;
@@ -17,25 +21,26 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class BookingService {
+public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final Sort sort = Sort.by("start").descending();
 
     @Autowired
-    public BookingService(BookingRepository bookingRepository, UserRepository userRepository, ItemRepository itemRepository) {
+    public BookingServiceImpl(BookingRepository bookingRepository, UserRepository userRepository, ItemRepository itemRepository) {
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
     }
 
+    @Override
     public BookingPostResponseDto addBooking(long userId, BookingPostDto bookingDto) {
         if (bookingDto.getStart().isAfter(bookingDto.getEnd())) {
             throw new ItemUnavailableException("Booking start is after end");
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User user = checkUserExists(userId);
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Item not found"));
         if (!item.getAvailable()) {
@@ -49,9 +54,9 @@ public class BookingService {
         return BookingMapper.toPostResponseDto(booking);
     }
 
+    @Override
     public BookingGetDto getBooking(long bookingId, long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User user = checkUserExists(userId);
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found"));
         if (!(booking.getBooker().equals(user) || booking.getItem().getOwner().equals(user))) {
@@ -60,6 +65,7 @@ public class BookingService {
         return BookingMapper.toBookingGetDto(booking);
     }
 
+    @Override
     public BookingPatchResponseDto updateBookingStatus(Long bookingId, Boolean approve, Long userId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found"));
@@ -67,22 +73,19 @@ public class BookingService {
             throw new NotFoundException("Wrong User");
         }
         BookingStatus status = convertToStatus(approve);
-
         if (booking.getStatus().equals(status)) {
             throw new ItemUnavailableException("Already approved");
         }
         booking.setStatus(status);
-
         bookingRepository.save(booking);
         return BookingMapper.toBookingPatchResponseDto(booking);
     }
 
-
+    @Override
     public List<BookingGetDto> findAllBookings(String state, Long userId) {
         State status = parseState(state);
-        userRepository.findById(userId).orElseThrow();
         LocalDateTime now = LocalDateTime.now();
-        Sort sort = Sort.by("start").descending();
+        checkUserExists(userId);
         List<Booking> bookings;
         switch (status) {
             case REJECTED:
@@ -109,14 +112,12 @@ public class BookingService {
         return BookingMapper.toBookingGetListDto(bookings);
     }
 
+    @Override
     public List<BookingGetDto> findAllByItemOwner(String state, Long userId) {
         State status = parseState(state);
-        //  checkIfUserExists(userId);
-        userRepository.findById(userId).orElseThrow();
+        checkUserExists(userId);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings;
-        Sort sort = Sort.by("start").descending();
-
         switch (status) {
             case REJECTED:
                 bookings = bookingRepository.findRejectedBookingsByOwner(userId, BookingStatus.REJECTED);
@@ -158,5 +159,10 @@ public class BookingService {
         } else {
             return BookingStatus.REJECTED;
         }
+    }
+
+    private User checkUserExists(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

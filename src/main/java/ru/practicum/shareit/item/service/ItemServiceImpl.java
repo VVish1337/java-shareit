@@ -3,8 +3,8 @@ package ru.practicum.shareit.item.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemUnavailableException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -32,7 +32,6 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final Sort sort = Sort.by("start").descending();
     private Item convertItem;
-    private List<Item> convertList;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository,
@@ -45,8 +44,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto saveItem(long userId, ItemDto itemDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User user = checkUserExists(userId);
         convertItem = itemRepository.save(ItemMapper.dtoToItem(itemDto, user));
         return ItemMapper.itemToDto(convertItem);
     }
@@ -64,7 +62,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemList(long userId) {
-        convertList = itemRepository.findAll().stream()
+        List<Item> convertList = itemRepository.findAll().stream()
                 .filter(item -> item.getOwner().getId().equals(userId))
                 .collect(Collectors.toList());
         return ItemMapper.listItemToDtoList(convertList).stream()
@@ -76,8 +74,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         Item oldItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User user = checkUserExists(userId);
         convertItem = (ItemMapper.dtoToItem(itemDto, user));
         if (oldItem.getOwner().getId() != userId) {
             throw new NotFoundException("Owner not found");
@@ -110,7 +107,7 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Comment text is blank");
         }
         Item item = itemRepository.findById(itemId).orElseThrow();
-        User author = userRepository.findById(userId).orElseThrow();
+        User author = checkUserExists(userId);
         if (bookingRepository.findSuitableBookingsForComments(itemId, userId, LocalDateTime.now()).isEmpty()) {
             throw new ItemUnavailableException("Booking items for comments not found");
         }
@@ -127,5 +124,10 @@ public class ItemServiceImpl implements ItemService {
                 .findByItemIdAndStartAfter(item.getId(), now, sort).stream()
                 .findFirst().orElse(null);
         return ItemMapper.itemToDto(item, lastBooking, nextBooking, comments);
+    }
+
+    private User checkUserExists(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

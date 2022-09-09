@@ -1,8 +1,9 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.booking.dto.BookingGetDto;
 import ru.practicum.shareit.booking.dto.BookingPatchResponseDto;
 import ru.practicum.shareit.booking.dto.BookingPostDto;
@@ -21,10 +22,10 @@ import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER
 public class BookingController {
 
     private static final String DEFAULT_STATE_VALUE = "ALL";
-    private final BookingService bookingService;
+    private final BookingServiceImpl bookingService;
 
     @Autowired
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingServiceImpl bookingService) {
         this.bookingService = bookingService;
     }
 

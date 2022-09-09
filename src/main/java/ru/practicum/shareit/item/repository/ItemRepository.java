@@ -7,15 +7,6 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    //    Item save(Item item);
-//
-//    Item getItemById(long itemId);
-//
-//    List<Item> getItemList(long userId);
-//
-//    Item updateItem(long itemId, Item item);
-//
-//    List<Item> searchItem(String text);
     @Query("select i from Item i " +
             "where upper(i.name) like upper(concat('%', ?1, '%')) " +
             " or upper(i.description) like upper(concat('%', ?1, '%')) and i.available = true")
