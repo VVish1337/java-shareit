@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class ItemMapper {
 
-    public static ItemDto itemToDto(Item item,List<Comment> comments) {
+    public static ItemDto itemToDto(Item item, List<Comment> comments) {
         ItemDto dto = new ItemDto();
         dto.setId(item.getId());
         dto.setName(item.getName());
@@ -41,7 +41,7 @@ public class ItemMapper {
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getAvailable(),
-                new User(user.getId(),user.getName(), user.getEmail()));
+                new User(user.getId(), user.getName(), user.getEmail()));
     }
 
     public static List<ItemDto> listItemToDtoList(List<Item> items) {
@@ -50,9 +50,9 @@ public class ItemMapper {
                 .collect(Collectors.toList());
     }
 
-    public static Comment toModelComment(CreateCommentDto dto, Item item, User user){
+    public static Comment toModelComment(CreateCommentDto dto, Item item, User user) {
         Comment comment = new Comment();
-        comment.setComment_text(dto.getText());
+        comment.setCommentText(dto.getText());
         comment.setItem(item);
         comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
@@ -62,7 +62,7 @@ public class ItemMapper {
     public static CommentDto toCommentDto(Comment comment) {
         CommentDto dto = new CommentDto();
         dto.setId(comment.getId());
-        dto.setText(comment.getComment_text());
+        dto.setText(comment.getCommentText());
         dto.setAuthorName(comment.getAuthor().getName());
         dto.setCreated(comment.getCreated());
         return dto;
@@ -75,9 +75,9 @@ public class ItemMapper {
     }
 
     public static ItemDto itemToDto(Item item,
-                                Booking lastBooking,
-                                Booking nextBooking,
-                                List<Comment> comments) {
+                                    Booking lastBooking,
+                                    Booking nextBooking,
+                                    List<Comment> comments) {
         ItemDto dto = new ItemDto();
         dto.setId(item.getId());
         dto.setName(item.getName());
