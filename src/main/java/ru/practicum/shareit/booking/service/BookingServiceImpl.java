@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class BookingServiceImpl implements BookingService {
 
@@ -60,6 +62,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found"));
         if (!(booking.getBooker().equals(user) || booking.getItem().getOwner().equals(user))) {
+            log.error("Owner or booker not found");
             throw new NotFoundException("Owner or booker not found");
         }
         return BookingMapper.toBookingGetDto(booking);
@@ -70,10 +73,12 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found"));
         if (!Objects.equals(booking.getItem().getOwner().getId(), userId)) {
+            log.error("Wrong User:" + userId);
             throw new NotFoundException("Wrong User");
         }
         BookingStatus status = convertToStatus(approve);
         if (booking.getStatus().equals(status)) {
+            log.error("Item already approved");
             throw new ItemUnavailableException("Already approved");
         }
         booking.setStatus(status);
@@ -148,6 +153,7 @@ public class BookingServiceImpl implements BookingService {
         try {
             status = State.valueOf(state);
         } catch (IllegalArgumentException e) {
+            log.error("Unsupported status:" + state);
             throw new UnsupportedStatusException("Unsupported status");
         }
         return status;

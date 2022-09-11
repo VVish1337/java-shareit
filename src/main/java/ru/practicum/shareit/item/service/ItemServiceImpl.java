@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ItemServiceImpl implements ItemService {
 
@@ -77,6 +79,7 @@ public class ItemServiceImpl implements ItemService {
         User user = checkUserExists(userId);
         convertItem = (ItemMapper.dtoToItem(itemDto, user));
         if (oldItem.getOwner().getId() != userId) {
+            log.error("Owner not found");
             throw new NotFoundException("Owner not found");
         }
         if (convertItem.getName() != null) {
@@ -104,11 +107,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDto createComment(CreateCommentDto commentDto, Long itemId, Long userId) {
         if (commentDto.getText().isBlank()) {
+            log.error("Comment text is blank");
             throw new NotFoundException("Comment text is blank");
         }
         Item item = itemRepository.findById(itemId).orElseThrow();
         User author = checkUserExists(userId);
         if (bookingRepository.findSuitableBookingsForComments(itemId, userId, LocalDateTime.now()).isEmpty()) {
+            log.error("Booking items for comments not found");
             throw new ItemUnavailableException("Booking items for comments not found");
         }
         Comment comment = ItemMapper.toModelComment(commentDto, item, author);

@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.mapper;
 
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -15,25 +15,13 @@ import java.util.stream.Collectors;
 
 public class ItemMapper {
 
-    public static ItemDto itemToDto(Item item, List<Comment> comments) {
-        ItemDto dto = new ItemDto();
-        dto.setId(item.getId());
-        dto.setName(item.getName());
-        dto.setDescription(item.getDescription());
-        dto.setAvailable(item.getAvailable());
-        if (comments != null) {
-            dto.setComments(toCommentDtoList(comments));
-        }
-        return dto;
-    }
-
     public static ItemDto itemToDto(Item item) {
-        ItemDto dto = new ItemDto();
-        dto.setId(item.getId());
-        dto.setName(item.getName());
-        dto.setDescription(item.getDescription());
-        dto.setAvailable(item.getAvailable());
-        return dto;
+        return ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .build();
     }
 
     public static Item dtoToItem(ItemDto itemDto, User user) {
@@ -51,21 +39,21 @@ public class ItemMapper {
     }
 
     public static Comment toModelComment(CreateCommentDto dto, Item item, User user) {
-        Comment comment = new Comment();
-        comment.setCommentText(dto.getText());
-        comment.setItem(item);
-        comment.setAuthor(user);
-        comment.setCreated(LocalDateTime.now());
-        return comment;
+        return Comment.builder()
+                .commentText(dto.getText())
+                .item(item)
+                .author(user)
+                .created(LocalDateTime.now())
+                .build();
     }
 
     public static CommentDto toCommentDto(Comment comment) {
-        CommentDto dto = new CommentDto();
-        dto.setId(comment.getId());
-        dto.setText(comment.getCommentText());
-        dto.setAuthorName(comment.getAuthor().getName());
-        dto.setCreated(comment.getCreated());
-        return dto;
+        return CommentDto.builder()
+                .id(comment.getId())
+                .text(comment.getCommentText())
+                .authorName(comment.getAuthor().getName())
+                .created(comment.getCreated())
+                .build();
     }
 
     public static List<CommentDto> toCommentDtoList(List<Comment> comments) {
@@ -78,16 +66,14 @@ public class ItemMapper {
                                     Booking lastBooking,
                                     Booking nextBooking,
                                     List<Comment> comments) {
-        ItemDto dto = new ItemDto();
-        dto.setId(item.getId());
-        dto.setName(item.getName());
-        dto.setDescription(item.getDescription());
-        dto.setAvailable(item.getAvailable());
-        dto.setLastBooking(BookingMapper.bookingInItemDto(lastBooking));
-        dto.setNextBooking(BookingMapper.bookingInItemDto(nextBooking));
-        if (comments != null) {
-            dto.setComments(toCommentDtoList(comments));
-        }
-        return dto;
+        return ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .lastBooking(BookingMapper.bookingInItemDto(lastBooking))
+                .nextBooking(BookingMapper.bookingInItemDto(nextBooking))
+                .comments(toCommentDtoList(comments))
+                .build();
     }
 }
