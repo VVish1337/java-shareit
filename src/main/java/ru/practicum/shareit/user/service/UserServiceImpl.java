@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -22,29 +23,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(UserDto userDto) {
-        convertUser = userRepository.save(UserMapper.userDtoToUser(userDto,0));
+        convertUser = userRepository.save(UserMapper.userDtoToUser(userDto, 0));
         return convertUser;
     }
 
     @Override
     public User getUserById(long id) {
-        return userRepository.getUserById(id);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Override
     public List<User> getUsersList() {
-        return userRepository.getUsersList();
+        return userRepository.findAll();
     }
 
     @Override
     public User updateUser(long userId, UserDto userDto) {
         getUserById(userId);
-        convertUser = userRepository.updateUser(UserMapper.userDtoToUser(userDto,userId));
+        convertUser = updateUserData(UserMapper.userDtoToUser(userDto, userId));
+        userRepository.save(convertUser);
         return convertUser;
     }
 
     @Override
     public void deleteUser(long userId) {
-        userRepository.deleteUser(userId);
+        userRepository.deleteById(userId);
+    }
+
+    private User updateUserData(User user) {
+        User oldUser = getUserById(user.getId());
+        if (user.getName() != null) {
+            oldUser.setName(user.getName());
+        }
+        if (user.getEmail() != null) {
+            oldUser.setEmail(user.getEmail());
+        }
+        return oldUser;
     }
 }
