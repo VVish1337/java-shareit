@@ -16,6 +16,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -32,21 +33,27 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final Sort sort = Sort.by("start").descending();
     private Item convertItem;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository,
-                           BookingRepository bookingRepository, CommentRepository commentRepository) {
+                           BookingRepository bookingRepository, CommentRepository commentRepository, ItemRequestRepository itemRequestRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Override
     public ItemDto saveItem(long userId, ItemDto itemDto) {
         User user = checkUserExists(userId);
+        if(itemDto.getRequestId()!=null){
+        itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(()->new NotFoundException("ItemRequest id not found"));
+        }
         convertItem = itemRepository.save(ItemMapper.dtoToItem(itemDto, user));
         return ItemMapper.itemToDto(convertItem);
     }
@@ -79,7 +86,7 @@ public class ItemServiceImpl implements ItemService {
         User user = checkUserExists(userId);
         convertItem = (ItemMapper.dtoToItem(itemDto, user));
         if (oldItem.getOwner().getId() != userId) {
-            log.error("Owner not found");
+            log.warn("Owner not found");
             throw new NotFoundException("Owner not found");
         }
         if (convertItem.getName() != null) {
@@ -107,13 +114,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDto createComment(CreateCommentDto commentDto, Long itemId, Long userId) {
         if (commentDto.getText().isBlank()) {
-            log.error("Comment text is blank");
+            log.warn("Comment text is blank");
             throw new NotFoundException("Comment text is blank");
         }
         Item item = itemRepository.findById(itemId).orElseThrow();
         User author = checkUserExists(userId);
         if (bookingRepository.findSuitableBookingsForComments(itemId, userId, LocalDateTime.now()).isEmpty()) {
-            log.error("Booking items for comments not found");
+            log.warn("Booking items for comments not found");
             throw new ItemUnavailableException("Booking items for comments not found");
         }
         Comment comment = ItemMapper.toModelComment(commentDto, item, author);

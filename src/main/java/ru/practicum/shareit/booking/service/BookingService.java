@@ -14,7 +14,7 @@ public interface BookingService {
 
     BookingPatchResponseDto updateBookingStatus(Long bookingId, Boolean approve, Long userId);
 
-    List<BookingGetDto> findAllBookings(String state, Long userId);
+    List<BookingGetDto> findAllBookings(String state, Long userId, int from, int size);
 
-    List<BookingGetDto> findAllByItemOwner(String state, Long userId);
+    List<BookingGetDto> findAllByItemOwner(String state, Long userId,int from,int size);
 }

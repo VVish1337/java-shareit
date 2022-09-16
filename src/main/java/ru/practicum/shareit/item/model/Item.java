@@ -1,9 +1,6 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -13,6 +10,7 @@ import java.util.Objects;
 @Setter
 @Table(name = "items")
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Item {
@@ -28,6 +26,8 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+    @Column(name = "request_id")
+    private Long requestId;
 
     @Override
     public boolean equals(Object o) {
@@ -38,11 +38,12 @@ public class Item {
                 && Objects.equals(name, item.name)
                 && Objects.equals(description, item.description)
                 && Objects.equals(available, item.available)
-                && Objects.equals(owner, item.owner);
+                && Objects.equals(owner, item.owner)
+                && Objects.equals(requestId, item.requestId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, available, owner);
+        return Objects.hash(id, name, description, available, owner, requestId);
     }
 }
