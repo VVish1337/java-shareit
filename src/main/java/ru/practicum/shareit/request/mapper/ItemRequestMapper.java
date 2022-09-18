@@ -11,6 +11,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,21 +31,33 @@ public class ItemRequestMapper {
     }
 
     public static ItemRequestWithItemsDto toItemRequestWithItemsDto(ItemRequest itemRequest,
-                                                                    List<Item> items, LocalDateTime now) {
+                                                                    List<Item> items) {
         return ItemRequestWithItemsDto.builder()
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
-                .created(now)
+                .created(itemRequest.getCreated())
                 .items(ItemMapper.toItemInRequestDtoList(items, itemRequest))
                 .build();
     }
 
     public static List<ItemRequestWithItemsDto> toItemRequestWithItemsListDto(List<ItemRequest> itemRequests,
-                                                                              ItemRepository repository,
-                                                                              LocalDateTime now) {
+                                                                              ItemRepository repository) {
         return itemRequests.stream()
-                .map(itemRequest -> toItemRequestWithItemsDto(itemRequest,
-                        repository.findAllByRequestId(itemRequest.getId()), now))
+                .map(itemRequest -> toItemRequestWithItemsDto(itemRequest, repository.findAllByRequestId(itemRequest.getId())))
                 .collect(Collectors.toList());
+    }
+
+    public static List<ItemRequestWithItemsDto> toRequestWithItemsDtoList(List<ItemRequest> requests,
+                                                                      ItemRepository repository) {
+        List<ItemRequestWithItemsDto> result = new ArrayList<>();
+        if (requests != null && !requests.isEmpty()) {
+            for (ItemRequest request : requests) {
+                List<Item> items = repository.findAllByRequestId(request.getId());
+                ItemRequestWithItemsDto requestDto = ItemRequestMapper.toItemRequestWithItemsDto(request, items);
+                result.add(requestDto);
+            }
+        }
+        System.out.println(result);
+        return result;
     }
 }

@@ -1,8 +1,8 @@
 package ru.practicum.shareit.request.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestPostDto;
 import ru.practicum.shareit.request.dto.ItemRequestPostResponseDto;
@@ -11,7 +11,7 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER;
@@ -19,6 +19,7 @@ import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER
 /**
  * // TODO .
  */
+@Validated
 @RestController
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
@@ -32,8 +33,8 @@ public class ItemRequestController {
     }
 
     @PostMapping
-    public ItemRequestPostResponseDto createItemRequest( @RequestHeader(USER_ID_HEADER) long userId,
-                                                         @Valid @RequestBody ItemRequestPostDto dto) {
+    public ItemRequestPostResponseDto createItemRequest(@RequestHeader(USER_ID_HEADER) long userId,
+                                                        @Valid @RequestBody ItemRequestPostDto dto) {
         return itemRequestService.createItemRequest(userId, dto);
     }
 
@@ -44,20 +45,14 @@ public class ItemRequestController {
     }
 
     @GetMapping("all")
-    public List<ItemRequestWithItemsDto> getItemRequestAll(@Min(0)
-                                                           @RequestParam(name = "from", defaultValue = "0")
-                                                           Integer from,
-                                                           @Positive @RequestParam(name = "size", defaultValue = "10")
-                                                           Integer size,
+    public List<ItemRequestWithItemsDto> getItemRequestAll(@Min(0) @RequestParam(defaultValue = "0") int from,
+                                                           @PositiveOrZero @RequestParam(defaultValue = "10") int size,
                                                            @RequestHeader(USER_ID_HEADER) long userId) {
-        int page = from/size;
-        final PageRequest pageRequest =  PageRequest.of(page,size,sort);
-        return itemRequestService.getItemRequestAll(pageRequest,userId);
+        return itemRequestService.getItemRequestAll(from, size, userId);
     }
 
     @GetMapping
-    public List<ItemRequestWithItemsDto> getItemRequestAllByUserId(@RequestHeader(USER_ID_HEADER) long userId){
+    public List<ItemRequestWithItemsDto> getItemRequestAllByUserId(@RequestHeader(USER_ID_HEADER) long userId) {
         return itemRequestService.getItemRequestAllByUserId(userId);
     }
-
 }

@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -27,6 +29,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final Sort sort = Sort.by("created").descending();
 
     @Autowired
     public ItemRequestServiceImpl(ItemRequestRepository itemRequestRepository, UserRepository userRepository, ItemRepository itemRepository) {
@@ -38,10 +41,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestPostResponseDto createItemRequest(long userId, ItemRequestPostDto dto) {
         User user = checkUserExists(userId);
-        System.out.println(dto);
-//        if(dto.getDescription()==null || dto.getDescription().isEmpty()){
-//            throw new ItemUnavailableException("description is empty");
-//        }
         ItemRequest itemRequest = itemRequestRepository
                 .save(ItemRequestMapper.toItemRequest(user, dto, LocalDateTime.now()));
         return ItemRequestMapper.toItemRequestPostResponseDto(itemRequest);
@@ -52,21 +51,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkUserExists(userId);
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Request not found"));
-//        if (itemRequest.getRequester().getId() != userId) {
-//            log.warn("Wrong user id");
-//            throw new NotFoundException("Wrong user id");
-//        }
         return ItemRequestMapper.toItemRequestWithItemsDto(itemRequest,
-                itemRepository.findAllByRequestId(requestId),
-                LocalDateTime.now());
+                itemRepository.findAllByRequestId(requestId));
     }
 
     @Override
-    public List<ItemRequestWithItemsDto> getItemRequestAll(PageRequest pageRequest, long userId) {
+    public List<ItemRequestWithItemsDto> getItemRequestAll(int from,int size, long userId) {
         checkUserExists(userId);
-        Page<ItemRequest> itemRequestsPage = itemRequestRepository.findAll(pageRequest);
-        List<ItemRequest> itemRequestList = itemRequestsPage.stream().collect(Collectors.toList());
-        return ItemRequestMapper.toItemRequestWithItemsListDto(itemRequestList, itemRepository, LocalDateTime.now());
+        Pageable pageable = PageRequest.of(from / size, size, sort);
+        List<ItemRequest> itemRequestList = itemRequestRepository.findAll(pageable).stream()
+                .filter(itemRequest->itemRequest.getRequester().getId()!=userId)
+                .collect(Collectors.toList());
+        return ItemRequestMapper.toItemRequestWithItemsListDto(itemRequestList, itemRepository);
     }
 
     @Override
@@ -74,8 +70,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkUserExists(userId);
         return ItemRequestMapper
                 .toItemRequestWithItemsListDto(itemRequestRepository.findAllByRequesterId(userId),
-                        itemRepository,
-                        LocalDateTime.now());
+                        itemRepository);
     }
 
     private User checkUserExists(long userId) {
