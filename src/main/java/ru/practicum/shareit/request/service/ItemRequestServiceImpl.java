@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -56,21 +55,23 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestWithItemsDto> getItemRequestAll(int from,int size, long userId) {
+    public List<ItemRequestWithItemsDto> getItemRequestAll(int from, int size, long userId) {
         checkUserExists(userId);
         Pageable pageable = PageRequest.of(from / size, size, sort);
-        List<ItemRequest> itemRequestList = itemRequestRepository.findAll(pageable).stream()
-                .filter(itemRequest->itemRequest.getRequester().getId()!=userId)
+        return itemRequestRepository.findAll(pageable).stream()
+                .filter(itemRequest -> itemRequest.getRequester().getId() != userId)
+                .map(itemRequest -> ItemRequestMapper.toItemRequestWithItemsDto(itemRequest,
+                        itemRepository.findAllByRequestId(itemRequest.getId())))
                 .collect(Collectors.toList());
-        return ItemRequestMapper.toItemRequestWithItemsListDto(itemRequestList, itemRepository);
     }
 
     @Override
     public List<ItemRequestWithItemsDto> getItemRequestAllByUserId(long userId) {
         checkUserExists(userId);
-        return ItemRequestMapper
-                .toItemRequestWithItemsListDto(itemRequestRepository.findAllByRequesterId(userId),
-                        itemRepository);
+        return itemRequestRepository.findAllByRequesterId(userId).stream()
+                .map(itemRequest -> ItemRequestMapper.toItemRequestWithItemsDto(itemRequest,
+                        itemRepository.findAllByRequestId(itemRequest.getId())))
+                .collect(Collectors.toList());
     }
 
     private User checkUserExists(long userId) {

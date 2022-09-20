@@ -9,7 +9,6 @@ import java.util.List;
 @Setter
 @Getter
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemRequestWithItemsDto {

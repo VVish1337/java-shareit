@@ -90,27 +90,27 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingGetDto> findAllBookings(String state, Long userId,int from,int size) {
+    public List<BookingGetDto> findAllBookings(String state, Long userId, int from, int size) {
         State status = parseState(state);
         LocalDateTime now = LocalDateTime.now();
         checkUserExists(userId);
         List<Booking> bookings;
-        pageable = PageRequest.of(from/size,size,sort);
+        pageable = PageRequest.of(from / size, size, sort);
         switch (status) {
             case REJECTED:
-                bookings = bookingRepository.findRejectedBookings(userId, BookingStatus.REJECTED,pageable).toList();
+                bookings = bookingRepository.findRejectedBookings(userId, BookingStatus.REJECTED, pageable).toList();
                 break;
             case WAITING:
-                bookings = bookingRepository.findRejectedBookings(userId, BookingStatus.WAITING,pageable).toList();
+                bookings = bookingRepository.findRejectedBookings(userId, BookingStatus.WAITING, pageable).toList();
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByBookerIdCurrent(userId, now,pageable).toList();
+                bookings = bookingRepository.findByBookerIdCurrent(userId, now, pageable).toList();
                 break;
             case FUTURE:
                 bookings = bookingRepository.findByBookerIdAndStartIsAfter(userId, now, pageable).toList();
                 break;
             case PAST:
-                bookings = bookingRepository.findPastBookings(userId, now,pageable).toList();
+                bookings = bookingRepository.findPastBookings(userId, now, pageable).toList();
                 break;
             case ALL:
                 bookings = bookingRepository.findByBookerId(userId, pageable).toList();
@@ -122,23 +122,23 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingGetDto> findAllByItemOwner(String state, Long userId,int from,int size) {
+    public List<BookingGetDto> findAllByItemOwner(String state, Long userId, int from, int size) {
         State status = parseState(state);
         checkUserExists(userId);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings;
-        pageable = PageRequest.of(from/size,size,sort);
+        pageable = PageRequest.of(from / size, size, sort);
         switch (status) {
             case REJECTED:
                 bookings = bookingRepository
-                        .findRejectedBookingsByOwner(userId, BookingStatus.REJECTED,pageable).toList();
+                        .findRejectedBookingsByOwner(userId, BookingStatus.REJECTED, pageable).toList();
                 break;
             case WAITING:
                 bookings = bookingRepository
-                        .findRejectedBookingsByOwner(userId, BookingStatus.WAITING,pageable).toList();
+                        .findRejectedBookingsByOwner(userId, BookingStatus.WAITING, pageable).toList();
                 break;
             case CURRENT:
-                bookings = bookingRepository.findBookingsByItemOwnerCurrent(userId, now,pageable).toList();
+                bookings = bookingRepository.findBookingsByItemOwnerCurrent(userId, now, pageable).toList();
                 break;
             case FUTURE:
                 bookings = bookingRepository.findByItemOwnerIdAndStartIsAfter(userId, now, pageable).toList();
@@ -147,7 +147,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findByItemOwnerIdAndEndIsBefore(userId, now, pageable).toList();
                 break;
             case ALL:
-                bookings = bookingRepository.findByItemOwnerId(userId,pageable).toList();
+                bookings = bookingRepository.findByItemOwnerId(userId, pageable).toList();
                 break;
             default:
                 throw new IllegalArgumentException("state:");

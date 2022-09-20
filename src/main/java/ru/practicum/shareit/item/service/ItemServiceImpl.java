@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
@@ -50,9 +52,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto saveItem(long userId, ItemDto itemDto) {
         User user = checkUserExists(userId);
-        if(itemDto.getRequestId()!=null){
-        itemRequestRepository.findById(itemDto.getRequestId())
-                    .orElseThrow(()->new NotFoundException("ItemRequest id not found"));
+        if (itemDto.getRequestId() != null) {
+            itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("ItemRequest id not found"));
         }
         convertItem = itemRepository.save(ItemMapper.dtoToItem(itemDto, user));
         return ItemMapper.itemToDto(convertItem);
@@ -70,11 +72,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemList(long userId) {
-        List<Item> convertList = itemRepository.findAll().stream()
-                .filter(item -> item.getOwner().getId().equals(userId))
-                .collect(Collectors.toList());
-        return ItemMapper.listItemToDtoList(convertList).stream()
+    public List<ItemDto> getItemList(long userId, int from, int size) {
+        Pageable pageable = PageRequest.of(from / size, size);
+        return ItemMapper.listItemToDtoList(itemRepository.findAll(pageable).stream()
+                        .filter(item -> item.getOwner().getId().equals(userId))
+                        .collect(Collectors.toList())).stream()
                 .map(item -> getItemById(item.getId(), userId))
                 .collect(Collectors.toList());
     }
@@ -103,11 +105,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItem(String text) {
+    public List<ItemDto> searchItem(String text,int from,int size) {
+        Pageable pageable = PageRequest.of(from / size, size);
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
-        List<Item> foundItems = itemRepository.search(text);
+        List<Item> foundItems = itemRepository.search(text,pageable).toList();
         return ItemMapper.listItemToDtoList(foundItems);
     }
 
