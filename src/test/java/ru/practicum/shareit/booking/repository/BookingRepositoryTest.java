@@ -126,7 +126,7 @@ class BookingRepositoryTest {
         Page<Booking> result = bookingRepository
                 .findByBookerIdAndStartIsAfter(booker.getId(), LocalDateTime.now(), Pageable.unpaged());
         assertNotNull(result);
-        assertEquals(booking,result);
+        assertEquals(booking,result.toList().get(0));
     }
 
     @Test
@@ -134,7 +134,7 @@ class BookingRepositoryTest {
         Page<Booking> result = bookingRepository
                 .findByBookerId(booker.getId(), Pageable.unpaged());
         assertNotNull(result);
-        assertEquals(booking,result);
+        assertEquals(booking,result.toList().get(0));
     }
 
     @Test

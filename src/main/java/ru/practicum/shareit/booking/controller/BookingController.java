@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.dto.BookingGetDto;
 import ru.practicum.shareit.booking.dto.BookingPatchResponseDto;
 import ru.practicum.shareit.booking.dto.BookingPostDto;
 import ru.practicum.shareit.booking.dto.BookingPostResponseDto;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.item.marker.Create;
 
@@ -25,10 +26,10 @@ import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER
 public class BookingController {
 
     private static final String DEFAULT_STATE_VALUE = "ALL";
-    private final BookingServiceImpl bookingService;
+    private final BookingService bookingService;
 
     @Autowired
-    public BookingController(BookingServiceImpl bookingService) {
+    public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
     }
 

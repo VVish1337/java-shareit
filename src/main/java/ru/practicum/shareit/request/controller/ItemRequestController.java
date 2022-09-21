@@ -25,7 +25,6 @@ import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER
 public class ItemRequestController {
 
     private final ItemRequestService itemRequestService;
-    private final Sort sort = Sort.by("created").descending();
 
     @Autowired
     public ItemRequestController(ItemRequestService itemRequestService) {
