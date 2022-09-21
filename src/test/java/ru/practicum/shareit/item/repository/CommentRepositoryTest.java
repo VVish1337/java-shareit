@@ -43,11 +43,11 @@ class CommentRepositoryTest {
         requestor = userRepository.save(new User(null, "requestor", "requestor@email.com"));
         itemRequest = requestRepository.save(new ItemRequest(null, "description", requestor, date));
         item = itemRepository.save(new Item(1,
-                        "item",
-                        "description",
-                        true,
-                        itemOwner,
-                        null));
+                "item",
+                "description",
+                true,
+                itemOwner,
+                null));
         comment = commentRepository.save(new Comment(1, "comment", item, itemOwner, LocalDateTime.now()));
     }
 

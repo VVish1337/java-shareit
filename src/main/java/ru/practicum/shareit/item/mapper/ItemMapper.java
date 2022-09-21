@@ -28,11 +28,6 @@ public class ItemMapper {
     }
 
     public static Item dtoToItem(ItemDto itemDto, User user) {
-//        return new Item(itemDto.getId(),
-//                itemDto.getName(),
-//                itemDto.getDescription(),
-//                itemDto.getAvailable(),
-//                user);
         return Item.builder()
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())

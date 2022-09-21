@@ -34,7 +34,7 @@ class ItemRepositoryTest {
     private ItemRequest itemRequest;
 
     @BeforeEach
-    void BeforeEach(){
+    void beforeEach() {
         itemOwner = userRepository.save(new User(1L, "owner", "owner@email"));
         user = userRepository.save(new User(2L, "user", "user@email"));
         itemRequest = requestRepository.save(new ItemRequest(
@@ -54,15 +54,14 @@ class ItemRepositoryTest {
     }
 
 
-
     @Test
     void search() {
         List<Item> testList = new ArrayList<>();
         testList.add(item);
-        List<Item> searchedItemList = itemRepository.search("item",Pageable.unpaged()).toList();
+        List<Item> searchedItemList = itemRepository.search("item", Pageable.unpaged()).toList();
         assertNotNull(searchedItemList);
         assertEquals(testList, searchedItemList);
-        assertEquals(testList.get(0),searchedItemList.get(0));
+        assertEquals(testList.get(0), searchedItemList.get(0));
     }
 
     @Test
@@ -71,7 +70,7 @@ class ItemRepositoryTest {
         testList.add(item);
         List<Item> foundList = itemRepository.findAllByRequestId(itemRequest.getId());
         assertNotNull(foundList);
-        assertEquals(testList,foundList);
+        assertEquals(testList, foundList);
     }
 
     @AfterEach

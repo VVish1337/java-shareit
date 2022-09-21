@@ -31,7 +31,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void createUserReturnSavedUser(){
+    void createUserReturnSavedUser() {
         UserDto postDto = new UserDto();
         postDto.setName(user.getName());
         postDto.setEmail(user.getEmail());
@@ -46,21 +46,21 @@ public class UserServiceTest {
     }
 
     @Test
-    void updateUserReturnUpdatedUser(){
+    void updateUserReturnUpdatedUser() {
         user.setName("updated name");
         UserDto postDto = UserMapper.userToDto(user);
         when(userRepository.save(any(User.class)))
                 .thenReturn(user);
         when(userRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(user));
-        User user = userService.updateUser(1L,postDto);
+        User user = userService.updateUser(1L, postDto);
         assertNotNull(user);
         assertEquals(1L, user.getId());
         assertEquals(postDto.getName(), user.getName());
     }
 
     @Test
-    void getByIdReturnUserFromDb(){
+    void getByIdReturnUserFromDb() {
         when(userRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(user));
         User user = userService.getUserById(1L);
@@ -69,7 +69,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void getAllUsersReturnList(){
+    void getAllUsersReturnList() {
         when(userRepository.findAll())
                 .thenReturn(Collections.singletonList(user));
 

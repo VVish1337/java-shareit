@@ -133,13 +133,13 @@ public class ItemControllerTest {
     }
 
     @Test
-    void searchItemPost200() throws Exception{
-        when(itemService.searchItem(anyString(),anyInt(),anyInt()))
+    void searchItemPost200() throws Exception {
+        when(itemService.searchItem(anyString(), anyInt(), anyInt()))
                 .thenReturn(new ArrayList<>());
         mvc.perform(get("/items/search")
-                        .param("text","text value")
-                        .param("from","1")
-                        .param("size","20"))
+                        .param("text", "text value")
+                        .param("from", "1")
+                        .param("size", "20"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
     }

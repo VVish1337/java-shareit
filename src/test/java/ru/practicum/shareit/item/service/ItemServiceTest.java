@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -22,6 +24,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,7 +64,7 @@ class ItemServiceTest {
                 itemRepository,
                 userRepository,
                 bookingRepository,
-                commentRepository,itemRequestRepository);
+                commentRepository, itemRequestRepository);
         user = new User(1L, "name", "user@mail.ru");
         item = new Item(
                 1L,
@@ -88,7 +91,7 @@ class ItemServiceTest {
                 user,
                 BookingStatus.APPROVED);
         itemRequest = new ItemRequest(
-                1L,"description",user,LocalDateTime.now()
+                1L, "description", user, LocalDateTime.now()
         );
     }
 
@@ -100,7 +103,7 @@ class ItemServiceTest {
                 .thenReturn(Optional.ofNullable(itemRequest));
         when(itemRepository.save(any(Item.class)))
                 .thenReturn(item);
-        ItemDto result = itemService.saveItem(1L,itemDto);
+        ItemDto result = itemService.saveItem(1L, itemDto);
         assertNotNull(result);
         assertEquals(itemDto.getName(), result.getName());
         assertEquals(itemDto.getDescription(), result.getDescription());
@@ -123,7 +126,7 @@ class ItemServiceTest {
 
 
     @Test
-     void createComment() {
+    void createComment() {
         when(itemRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(item));
         when(userRepository.findById(any(Long.class)))
@@ -140,7 +143,7 @@ class ItemServiceTest {
     }
 
     @Test
-     void createCommentThrowException() {
+    void createCommentThrowException() {
         when(itemRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(item));
 
@@ -169,11 +172,55 @@ class ItemServiceTest {
                 .thenReturn(item);
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.ofNullable(item));
-        ItemDto result = itemService.updateItem(user.getId(),item.getId(),itemDto);
+        ItemDto result = itemService.updateItem(user.getId(), item.getId(), itemDto);
         assertNotNull(result);
         assertEquals(itemDto.getId(), result.getId());
         assertEquals(itemDto.getName(), result.getName());
     }
 
 
+    @Test
+    public void updateItemThrowNotFound() {
+        item.setOwner(user);
+        when(commentRepository.findByItemId(any(Long.class)))
+                .thenReturn(new ArrayList<>());
+        when(itemRepository.findById(any(Long.class)))
+                .thenReturn(Optional.ofNullable(item));
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            itemService.updateItem(user.getId(), itemDto.getId(), itemDto);
+        });
+        assertNotNull(exception);
+    }
+
+    @Test
+    public void findItemById() {
+        when(itemRepository.findById(any(Long.class)))
+                .thenReturn(Optional.ofNullable(item));
+        when(commentRepository.findByItemId(any(Long.class)))
+                .thenReturn(new ArrayList<>());
+        ItemDto result = itemService.getItemById(item.getId(), 1L);
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertTrue(result.getComments().isEmpty());
+    }
+
+    @Test
+    public void findAllItems() {
+        when(itemRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(new ArrayList<>()));
+        List<ItemDto> result = itemService.getItemList(1L, 1, 20);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void findItemsByRequestTest() {
+        when(itemRepository.search(any(String.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(new ArrayList<>()));
+
+        List<ItemDto> result = itemService.searchItem("item", 1, 10);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
 }

@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class BookingPostDto {
     private Long id;
     private Long itemId;
