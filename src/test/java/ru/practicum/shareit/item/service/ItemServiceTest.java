@@ -118,6 +118,17 @@ class ItemServiceTest {
     }
 
     @Test
+    void updateItemThrowNotFoundException() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+        NotFoundException e = assertThrows(NotFoundException.class,
+                () -> itemService.updateItem(2L, 1L, itemDto));
+        assertNotNull(e);
+    }
+
+    @Test
     void createComment() {
         when(itemRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(item));
@@ -149,6 +160,21 @@ class ItemServiceTest {
     }
 
     @Test
+    void createCommentThrowNotFoundException() {
+        createCommentDto.setText("");
+        when(itemRepository.findById(any(Long.class)))
+                .thenReturn(Optional.ofNullable(item));
+        when(userRepository.findById(any(Long.class)))
+                .thenReturn(Optional.ofNullable(user));
+        when(bookingRepository
+                .findSuitableBookingsForComments(anyLong(), anyLong(), any(LocalDateTime.class)))
+                .thenReturn(Collections.emptyList());
+        NotFoundException result = assertThrows(NotFoundException.class,
+                () -> itemService.createComment(createCommentDto, item.getId(), user.getId()));
+        assertNotNull(result);
+    }
+
+    @Test
     public void updateItem() {
         itemDto.setName("updatedName");
         item.setName("updatedName");
@@ -165,7 +191,6 @@ class ItemServiceTest {
         assertEquals(itemDto.getId(), result.getId());
         assertEquals(itemDto.getName(), result.getName());
     }
-
 
     @Test
     public void updateItemThrowNotFound() {
@@ -208,4 +233,6 @@ class ItemServiceTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
+
+
 }

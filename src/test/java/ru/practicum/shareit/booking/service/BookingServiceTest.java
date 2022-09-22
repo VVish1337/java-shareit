@@ -307,4 +307,16 @@ class BookingServiceTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
     }
+
+    @Test
+    public void findAllByItemOwnerStateAll() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        when(bookingRepository
+                .findByItemOwnerId(anyLong(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(booking)));
+        List<BookingGetDto> result = bookingService.findAllByItemOwner("ALL", user.getId(), 1, 10);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+    }
 }
