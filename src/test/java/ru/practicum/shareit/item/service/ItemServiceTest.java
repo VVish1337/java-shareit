@@ -35,15 +35,12 @@ import static org.mockito.Mockito.when;
 
 
 class ItemServiceTest {
-
-
     private ItemService itemService;
     private ItemRepository itemRepository;
     private UserRepository userRepository;
     private BookingRepository bookingRepository;
     private CommentRepository commentRepository;
     private ItemRequestRepository itemRequestRepository;
-
     private Item item;
     private User user;
     private ItemDto itemDto;
@@ -51,7 +48,6 @@ class ItemServiceTest {
     private Booking booking;
     private CreateCommentDto createCommentDto;
     private ItemRequest itemRequest;
-
 
     @BeforeEach
     public void beforeEach() {
@@ -96,7 +92,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void createItemTest() {
+    void createItem() {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         when(itemRequestRepository.findById(anyLong()))
@@ -116,14 +112,10 @@ class ItemServiceTest {
     void createItemThrowNotFoundException() {
         when(userRepository.findAll())
                 .thenReturn(Collections.emptyList());
-
         NotFoundException e = assertThrows(NotFoundException.class,
-                () -> {
-                    itemService.saveItem(2L, itemDto);
-                });
+                () -> itemService.saveItem(2L, itemDto));
         assertNotNull(e);
     }
-
 
     @Test
     void createComment() {
@@ -146,22 +138,18 @@ class ItemServiceTest {
     void createCommentThrowException() {
         when(itemRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(item));
-
         when(userRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(user));
-
         when(bookingRepository
                 .findSuitableBookingsForComments(anyLong(), anyLong(), any(LocalDateTime.class)))
                 .thenReturn(Collections.emptyList());
-
-        ItemUnavailableException result = assertThrows(ItemUnavailableException.class, () -> {
-            itemService.createComment(createCommentDto, item.getId(), user.getId());
-        });
+        ItemUnavailableException result = assertThrows(ItemUnavailableException.class,
+                () -> itemService.createComment(createCommentDto, item.getId(), user.getId()));
         assertNotNull(result);
     }
 
     @Test
-    public void updateItemTest() {
+    public void updateItem() {
         itemDto.setName("updatedName");
         item.setName("updatedName");
         when(userRepository.findById(anyLong()))
@@ -186,9 +174,8 @@ class ItemServiceTest {
                 .thenReturn(new ArrayList<>());
         when(itemRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(item));
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
-            itemService.updateItem(user.getId(), itemDto.getId(), itemDto);
-        });
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> itemService.updateItem(user.getId(), itemDto.getId(), itemDto));
         assertNotNull(exception);
     }
 
@@ -214,12 +201,10 @@ class ItemServiceTest {
     }
 
     @Test
-    public void findItemsByRequestTest() {
+    public void findItemsByRequest() {
         when(itemRepository.search(any(String.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(new ArrayList<>()));
-
         List<ItemDto> result = itemService.searchItem("item", 1, 10);
-
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }

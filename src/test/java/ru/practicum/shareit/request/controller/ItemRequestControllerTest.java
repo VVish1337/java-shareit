@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +8,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.booking.controller.BookingController;
-import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestPostDto;
 import ru.practicum.shareit.request.dto.ItemRequestPostResponseDto;
 import ru.practicum.shareit.request.dto.ItemRequestWithItemsDto;
@@ -20,16 +16,14 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER;
@@ -48,7 +42,7 @@ class ItemRequestControllerTest {
     @Test
     void createItemRequestPost200() throws Exception {
         ItemRequestPostDto dto = getItemRequestPostDto();
-        when(itemRequestService.createItemRequest(anyLong() ,any(ItemRequestPostDto.class)))
+        when(itemRequestService.createItemRequest(anyLong(), any(ItemRequestPostDto.class)))
                 .thenReturn(getItemRequestPostResponseDto(dto));
         mvc.perform(post("/requests")
                         .content(mapper.writeValueAsString(getItemRequestPostResponseDto(dto)))
@@ -59,13 +53,12 @@ class ItemRequestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(getItemRequestPostResponseDto(dto).getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(getItemRequestPostResponseDto(dto).getDescription())));
-
     }
 
     @Test
     void getItemRequestPost200() throws Exception {
         ItemRequestWithItemsDto dto = getItemRequestWithItemsDto();
-        when(itemRequestService.getItemRequest(anyLong(),anyLong()))
+        when(itemRequestService.getItemRequest(anyLong(), anyLong()))
                 .thenReturn(getItemRequestWithItemsDto());
         mvc.perform(get("/requests/1")
                         .content(mapper.writeValueAsString(dto))
@@ -80,9 +73,9 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    void getItemRequestAllPost200() throws Exception{
+    void getItemRequestAllPost200() throws Exception {
         ItemRequestWithItemsDto dto = getItemRequestWithItemsDto();
-        when(itemRequestService.getItemRequestAll(anyInt(),anyInt(),anyLong()))
+        when(itemRequestService.getItemRequestAll(anyInt(), anyInt(), anyLong()))
                 .thenReturn(Collections.singletonList(dto));
         mvc.perform(get("/requests/all")
                         .content(mapper.writeValueAsString(dto))
@@ -113,7 +106,7 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$[0].items", is(dto.getItems()), List.class));
     }
 
-    private ItemRequestWithItemsDto getItemRequestWithItemsDto(){
+    private ItemRequestWithItemsDto getItemRequestWithItemsDto() {
         return ItemRequestWithItemsDto.builder()
                 .id(1L)
                 .description("description")
@@ -122,8 +115,8 @@ class ItemRequestControllerTest {
                 .build();
     }
 
-    private ItemRequestPostResponseDto getItemRequestPostResponseDto(ItemRequestPostDto dto){
-      return   ItemRequestPostResponseDto.builder()
+    private ItemRequestPostResponseDto getItemRequestPostResponseDto(ItemRequestPostDto dto) {
+        return ItemRequestPostResponseDto.builder()
                 .id(1L)
                 .description(dto.getDescription())
                 .created(LocalDateTime.now()).build();

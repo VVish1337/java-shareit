@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -25,23 +23,13 @@ class CommentRepositoryTest {
     private UserRepository userRepository;
     @Autowired
     private ItemRepository itemRepository;
-
-    @Autowired
-    private ItemRequestRepository requestRepository;
-
-
     private Item item;
     private User itemOwner;
-    private User requestor;
     private Comment comment;
-    private ItemRequest itemRequest;
 
     @BeforeEach
     public void beforeEach() {
-        LocalDateTime date = LocalDateTime.now();
         itemOwner = userRepository.save(new User(null, "itemOwner", "itemOwner@email.com"));
-        requestor = userRepository.save(new User(null, "requestor", "requestor@email.com"));
-        itemRequest = requestRepository.save(new ItemRequest(null, "description", requestor, date));
         item = itemRepository.save(new Item(1,
                 "item",
                 "description",
@@ -61,5 +49,4 @@ class CommentRepositoryTest {
         assertEquals(comment.getAuthor(), itemOwner);
         assertEquals(comment.getItem(), item);
     }
-
 }

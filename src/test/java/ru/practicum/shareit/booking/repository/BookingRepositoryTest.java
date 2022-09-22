@@ -32,22 +32,17 @@ class BookingRepositoryTest {
     @Autowired
     private ItemRepository itemRepository;
 
-    private Item item;
     private User booker;
-    private User itemOwner;
     private Booking booking;
-    private LocalDateTime end;
-    private LocalDateTime start;
-    private BookingStatus bookingStatus;
 
     @BeforeEach
     public void beforeEach() {
-        start = LocalDateTime.now().plusDays(2);
-        end = start.plusDays(7);
-        bookingStatus = BookingStatus.APPROVED;
-        itemOwner = userRepository.save(new User(null, "user 1", "user1@gmail.com"));
+        LocalDateTime start = LocalDateTime.now().plusDays(2);
+        LocalDateTime end = start.plusDays(7);
+        BookingStatus bookingStatus = BookingStatus.APPROVED;
+        User itemOwner = userRepository.save(new User(null, "user 1", "user1@gmail.com"));
         booker = userRepository.save(new User(null, "user 2", "user2@gmail.com"));
-        item = itemRepository.save(
+        Item item = itemRepository.save(
                 new Item(1L,
                         "item 1",
                         "description",
@@ -55,7 +50,7 @@ class BookingRepositoryTest {
                         itemOwner,
                         null));
         booking = bookingRepository
-                .save(new Booking(null, start, end, item, booker,bookingStatus));
+                .save(new Booking(null, start, end, item, booker, bookingStatus));
     }
 
     @AfterEach
@@ -126,7 +121,7 @@ class BookingRepositoryTest {
         Page<Booking> result = bookingRepository
                 .findByBookerIdAndStartIsAfter(booker.getId(), LocalDateTime.now(), Pageable.unpaged());
         assertNotNull(result);
-        assertEquals(booking,result.toList().get(0));
+        assertEquals(booking, result.toList().get(0));
     }
 
     @Test
@@ -134,13 +129,13 @@ class BookingRepositoryTest {
         Page<Booking> result = bookingRepository
                 .findByBookerId(booker.getId(), Pageable.unpaged());
         assertNotNull(result);
-        assertEquals(booking,result.toList().get(0));
+        assertEquals(booking, result.toList().get(0));
     }
 
     @Test
     void findByItemOwnerId() {
         Page<Booking> result = bookingRepository
-                .findByItemOwnerId(booker.getId(),  Pageable.unpaged());
+                .findByItemOwnerId(booker.getId(), Pageable.unpaged());
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
@@ -172,7 +167,7 @@ class BookingRepositoryTest {
     @Test
     void findByItemIdAndStartAfter() {
         List<Booking> result = bookingRepository
-                .findByItemIdAndStartAfter(booker.getId(),LocalDateTime.now(),Sort.unsorted());
+                .findByItemIdAndStartAfter(booker.getId(), LocalDateTime.now(), Sort.unsorted());
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }

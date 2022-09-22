@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
     private UserService userService;
     private UserRepository userRepository;
-
     private User user;
 
     @BeforeEach
@@ -72,12 +71,9 @@ public class UserServiceTest {
     void getAllUsersReturnList() {
         when(userRepository.findAll())
                 .thenReturn(Collections.singletonList(user));
-
         List<User> list = userService.getUsersList();
-
         assertNotNull(list);
         assertEquals(1, list.size());
         assertEquals(user.getId(), list.get(0).getId());
-
     }
 }

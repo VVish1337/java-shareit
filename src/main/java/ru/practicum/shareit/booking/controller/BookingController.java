@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.dto.BookingPatchResponseDto;
 import ru.practicum.shareit.booking.dto.BookingPostDto;
 import ru.practicum.shareit.booking.dto.BookingPostResponseDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.item.marker.Create;
 
 import javax.validation.constraints.Min;
@@ -49,7 +48,6 @@ public class BookingController {
     public BookingPatchResponseDto updateBookingStatus(@PathVariable Long bookingId,
                                                        @RequestParam Boolean approved,
                                                        @RequestHeader(USER_ID_HEADER) Long userId) {
-        System.out.println(approved);
         return bookingService.updateBookingStatus(bookingId, approved, userId);
     }
 

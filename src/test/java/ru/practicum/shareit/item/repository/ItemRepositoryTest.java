@@ -28,15 +28,13 @@ class ItemRepositoryTest {
     private ItemRepository itemRepository;
     @Autowired
     private ItemRequestRepository requestRepository;
-    private User itemOwner;
-    private User user;
     private Item item;
     private ItemRequest itemRequest;
 
     @BeforeEach
     void beforeEach() {
-        itemOwner = userRepository.save(new User(1L, "owner", "owner@email"));
-        user = userRepository.save(new User(2L, "user", "user@email"));
+        User itemOwner = userRepository.save(new User(1L, "owner", "owner@email"));
+        User user = userRepository.save(new User(2L, "user", "user@email"));
         itemRequest = requestRepository.save(new ItemRequest(
                 1L,
                 "description",
@@ -50,9 +48,7 @@ class ItemRepositoryTest {
                 true,
                 itemOwner,
                 itemRequest.getId()));
-
     }
-
 
     @Test
     void search() {
