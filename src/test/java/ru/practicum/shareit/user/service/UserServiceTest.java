@@ -76,4 +76,9 @@ public class UserServiceTest {
         assertEquals(1, list.size());
         assertEquals(user.getId(), list.get(0).getId());
     }
+
+    @Test
+    void deleteUser() {
+        userService.deleteUser(1L);
+    }
 }

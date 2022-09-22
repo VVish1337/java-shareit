@@ -105,6 +105,12 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[1].email", is(user2.getEmail())));
     }
 
+    @Test
+    void deleteUserPost200() throws Exception {
+        mvc.perform(delete("/users/1"))
+                .andExpect(status().isOk());
+    }
+
     private void createUser(User user) {
         when(userService.save(any(UserDto.class)))
                 .thenReturn(user);

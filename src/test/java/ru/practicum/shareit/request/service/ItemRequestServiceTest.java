@@ -98,6 +98,7 @@ class ItemRequestServiceTest {
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals(itemRequest.getDescription(), result.getDescription());
+        ;
         assertNotNull(result.getItems());
         assertTrue(result.getItems().isEmpty());
     }

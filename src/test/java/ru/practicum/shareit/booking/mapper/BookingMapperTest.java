@@ -36,11 +36,19 @@ class BookingMapperTest {
                 bookingPostDto.getEnd(),
                 item, user,
                 BookingStatus.APPROVED);
-        bookingPostResponseDto = new BookingPostResponseDto(1L, item, bookingPostDto.getStart(),
-                bookingPostDto.getEnd());
+        bookingPostResponseDto = BookingPostResponseDto.builder()
+                .id(1L)
+                .item(item)
+                .start(bookingPostDto.getStart())
+                .end(bookingPostDto.getEnd())
+                .build();
         bookingGetDto = new BookingGetDto(1L, bookingPostDto.getStart(),
                 bookingPostDto.getEnd(), BookingStatus.APPROVED, user, item, item.getName());
-        bookingPatchResponseDto = new BookingPatchResponseDto(1L, BookingStatus.APPROVED, user, item, item.getName());
+        bookingPatchResponseDto = BookingPatchResponseDto.builder().id(1L)
+                .status(BookingStatus.APPROVED)
+                .booker(user)
+                .item(item)
+                .name(item.getName()).build();
         bookingInItemDto = new BookingInItemDto(1L, user.getId(), bookingPostDto.getStart(),
                 bookingPostDto.getEnd());
     }

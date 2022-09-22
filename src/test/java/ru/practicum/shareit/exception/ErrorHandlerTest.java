@@ -36,9 +36,10 @@ class ErrorHandlerTest {
 
     @Test
     void handleUnsupportedStatus() {
-        UnsupportedStatusException e = new UnsupportedStatusException("Unsupported");
+        UnsupportedStatusException e = new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         ErrorResponseStatus errorResponse = handler.handle(e);
         assertNotNull(errorResponse);
+        assertEquals(errorResponse.getError(),e.getMessage());
         assertEquals(errorResponse.getDescription(), e.getMessage());
     }
 }
