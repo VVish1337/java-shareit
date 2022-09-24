@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.util.PaginationUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +31,6 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final Sort sort = Sort.by("start").descending();
-    private Pageable pageable;
 
     @Autowired
     public BookingServiceImpl(BookingRepository bookingRepository, UserRepository userRepository, ItemRepository itemRepository) {
@@ -95,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime now = LocalDateTime.now();
         checkUserExists(userId);
         List<Booking> bookings;
-        pageable = PageRequest.of(from / size, size, sort);
+        Pageable pageable = PaginationUtil.getPageable(from, size, sort);
         switch (status) {
             case REJECTED:
                 bookings = bookingRepository.findRejectedBookings(userId, BookingStatus.REJECTED, pageable).toList();
@@ -127,7 +126,7 @@ public class BookingServiceImpl implements BookingService {
         checkUserExists(userId);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings;
-        pageable = PageRequest.of(from / size, size, sort);
+        Pageable pageable = PaginationUtil.getPageable(from, size, sort);
         switch (status) {
             case REJECTED:
                 bookings = bookingRepository

@@ -2,6 +2,9 @@ package ru.practicum.shareit.user.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -14,18 +17,18 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class UserServiceTest {
-    private UserService userService;
+    @InjectMocks
+    private UserServiceImpl userService;
+    @Mock
     private UserRepository userRepository;
     private User user;
 
     @BeforeEach
     void beforeEach() {
-        userRepository = mock(UserRepository.class);
-        userService = new UserServiceImpl(userRepository);
         user = new User(1L, "user1", "user1@email.com");
     }
 

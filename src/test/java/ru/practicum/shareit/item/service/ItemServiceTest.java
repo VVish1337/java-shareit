@@ -2,6 +2,9 @@ package ru.practicum.shareit.item.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.model.Booking;
@@ -30,16 +33,21 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class ItemServiceTest {
-    private ItemService itemService;
+    @InjectMocks
+    private ItemServiceImpl itemService;
+    @Mock
     private ItemRepository itemRepository;
+    @Mock
     private UserRepository userRepository;
+    @Mock
     private BookingRepository bookingRepository;
+    @Mock
     private CommentRepository commentRepository;
+    @Mock
     private ItemRequestRepository itemRequestRepository;
     private Item item;
     private User user;
@@ -51,16 +59,6 @@ class ItemServiceTest {
 
     @BeforeEach
     public void beforeEach() {
-        itemRepository = mock(ItemRepository.class);
-        userRepository = mock(UserRepository.class);
-        bookingRepository = mock(BookingRepository.class);
-        commentRepository = mock(CommentRepository.class);
-        itemRequestRepository = mock(ItemRequestRepository.class);
-        itemService = new ItemServiceImpl(
-                itemRepository,
-                userRepository,
-                bookingRepository,
-                commentRepository, itemRequestRepository);
         user = new User(1L, "name", "user@mail.ru");
         item = new Item(
                 1L,
@@ -109,7 +107,7 @@ class ItemServiceTest {
 
 
     @Test
-    void createItemThrowNotFoundException() {
+    void createItemThrowExceptionIfUserIdNotFound() {
         when(userRepository.findAll())
                 .thenReturn(Collections.emptyList());
         NotFoundException e = assertThrows(NotFoundException.class,
@@ -118,7 +116,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void updateItemThrowNotFoundException() {
+    void updateItemThrowNotFoundExceptionIfUserIdNotEquals() {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         when(itemRepository.findById(anyLong()))
@@ -146,7 +144,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void createCommentThrowException() {
+    void createCommentThrowExceptionIfItemsForBookingNotFound() {
         when(itemRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(item));
         when(userRepository.findById(any(Long.class)))
@@ -160,7 +158,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void createCommentThrowNotFoundException() {
+    void createCommentThrowNotFoundExceptionIfCommentDescriptionBlank() {
         createCommentDto.setText("");
         when(itemRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(item));
@@ -193,7 +191,7 @@ class ItemServiceTest {
     }
 
     @Test
-    public void updateItemThrowNotFound() {
+    public void updateItemThrowIfOwnerNotFound() {
         item.setOwner(user);
         when(commentRepository.findByItemId(any(Long.class)))
                 .thenReturn(new ArrayList<>());
@@ -233,6 +231,4 @@ class ItemServiceTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
-
-
 }

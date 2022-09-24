@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import ru.practicum.shareit.booking.dto.BookingGetDto;
 import ru.practicum.shareit.booking.dto.BookingPatchResponseDto;
 import ru.practicum.shareit.booking.dto.BookingPostDto;
@@ -36,12 +37,12 @@ class BookingControllerTest {
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     @MockBean
-    BookingService bookingService;
+    private BookingService bookingService;
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
 
     @Test
-    void createBookingPost200() throws Exception {
+    void shouldReturn200OnPostCreateBooking() throws Exception {
         BookingPostDto bookingPostDto = getBookingPostDto();
         when(bookingService.addBooking(anyLong(), any(BookingPostDto.class)))
                 .thenReturn(getBookingPostResponseDto());
@@ -57,18 +58,17 @@ class BookingControllerTest {
     }
 
     @Test
-    void findByIdPost200() throws Exception {
+    void shouldReturn200OnPostGetBooking() throws Exception {
         BookingGetDto responseDto = getBookingGetDto();
         when(bookingService.getBooking(anyLong(), anyLong()))
                 .thenReturn(responseDto);
-        mvc.perform(get("/bookings/1")
-                        .header(USER_ID_HEADER, 1L))
+        getContent("/1", responseDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(responseDto.getId()), Long.class));
     }
 
     @Test
-    void updateBookingStatusPost200() throws Exception {
+    void shouldReturn200OnPostUpdateBookingStatus() throws Exception {
         BookingPatchResponseDto responseDto = getBookingPatchResponse();
         when(bookingService.updateBookingStatus(anyLong(), any(Boolean.class), anyLong()))
                 .thenReturn(responseDto);
@@ -80,23 +80,21 @@ class BookingControllerTest {
     }
 
     @Test
-    void findAllBookingsPost200() throws Exception {
+    void shouldReturn200OnPostFindAllBookings() throws Exception {
         BookingGetDto responseDto = getBookingGetDto();
         when(bookingService.findAllBookings(any(String.class), anyLong(), anyInt(), anyInt()))
                 .thenReturn(Collections.singletonList(responseDto));
-        mvc.perform(get("/bookings")
-                        .header(USER_ID_HEADER, 1L))
+        getContent("", responseDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(responseDto.getId()), Long.class));
     }
 
     @Test
-    void findAllBookingsByItemOwnerPost200() throws Exception {
+    void shouldReturn200OnPostFindAllBookingsByItemOwner() throws Exception {
         BookingGetDto responseDto = getBookingGetDto();
         when(bookingService.findAllByItemOwner(any(String.class), anyLong(), anyInt(), anyInt()))
                 .thenReturn(Collections.singletonList(responseDto));
-        mvc.perform(get("/bookings/owner")
-                        .header(USER_ID_HEADER, 1L))
+        getContent("/owner", responseDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(responseDto.getId()), Long.class));
     }
@@ -135,5 +133,14 @@ class BookingControllerTest {
                 .booker(new User(1L, "name", "user@gmail.com"))
                 .item(new Item(1L, "name", "name", true, null, null))
                 .build();
+    }
+
+    private ResultActions getContent(String url, BookingGetDto dto) throws Exception {
+        return mvc.perform(get("/bookings" + url, 1)
+                .content(mapper.writeValueAsString(dto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(USER_ID_HEADER, 1)
+                .accept(MediaType.APPLICATION_JSON));
     }
 }

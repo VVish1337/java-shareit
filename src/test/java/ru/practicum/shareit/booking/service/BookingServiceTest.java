@@ -2,6 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.BookingGetDto;
@@ -27,16 +30,18 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class BookingServiceTest {
-
-    private BookingService bookingService;
+    @InjectMocks
+    private BookingServiceImpl bookingService;
+    @Mock
     private UserRepository userRepository;
+    @Mock
     private ItemRepository itemRepository;
+    @Mock
     private BookingRepository bookingRepository;
-
     private User user;
     private Item item;
     private User owner;
@@ -45,10 +50,6 @@ class BookingServiceTest {
 
     @BeforeEach
     public void beforeEach() {
-        userRepository = mock(UserRepository.class);
-        itemRepository = mock(ItemRepository.class);
-        bookingRepository = mock(BookingRepository.class);
-        bookingService = new BookingServiceImpl(bookingRepository, userRepository, itemRepository);
         bookingPostDto = new BookingPostDto(1L, 1L, LocalDateTime.now(), LocalDateTime.now().plusDays(7));
         user = new User(1L, "name", "user@mail.ru");
         owner = new User(2L, "owner", "user2@mail.ru");
@@ -68,7 +69,7 @@ class BookingServiceTest {
     }
 
     @Test
-    public void createBookingTest() {
+    public void createBooking() {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         when(itemRepository.findById(anyLong()))
@@ -105,14 +106,12 @@ class BookingServiceTest {
     }
 
     @Test
-    public void findAllByBookerUnsupportedStatus() {
+    public void findAllByBookerThrowUnsupportedStatusIfStatusNotFit() {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.ofNullable(user));
-
         when(bookingRepository
                 .findByBookerId(anyLong(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(booking)));
-
         UnsupportedStatusException e = assertThrows(UnsupportedStatusException.class,
                 () -> bookingService
                         .findAllByItemOwner("unsupported", 1L, 1, 10));
@@ -137,12 +136,11 @@ class BookingServiceTest {
     }
 
     @Test
-    public void patchBookingItemThrowUnavailable() {
+    public void patchBookingItemThrowUnavailableIfStatusAlreadyApprove() {
         booking.setStatus(BookingStatus.APPROVED);
         item.setOwner(owner);
         when(bookingRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(booking));
-
         when(itemRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(item));
         ItemUnavailableException e = assertThrows(ItemUnavailableException.class,
@@ -151,7 +149,7 @@ class BookingServiceTest {
     }
 
     @Test
-    public void patchBookingThrowNotFound() {
+    public void patchBookingThrowNotFoundIfItemOwnerEqualsUserId() {
         booking.setStatus(BookingStatus.WAITING);
         booking.setStatus(BookingStatus.APPROVED);
         when(bookingRepository.findById(anyLong()))
@@ -234,7 +232,6 @@ class BookingServiceTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
     }
-
 
     @Test
     public void findAllStateAll() {

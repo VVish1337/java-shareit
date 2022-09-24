@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.util.PaginationUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemList(long userId, int from, int size) {
-        Pageable pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PaginationUtil.getPageable(from, size, Sort.unsorted());
         return ItemMapper.listItemToDtoList(itemRepository.findAll(pageable).stream()
                         .filter(item -> item.getOwner().getId().equals(userId))
                         .collect(Collectors.toList())).stream()
@@ -105,12 +105,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItem(String text,int from,int size) {
-        Pageable pageable = PageRequest.of(from / size, size);
+    public List<ItemDto> searchItem(String text, int from, int size) {
+        Pageable pageable = PaginationUtil.getPageable(from, size, Sort.unsorted());
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
-        List<Item> foundItems = itemRepository.search(text,pageable).toList();
+        List<Item> foundItems = itemRepository.search(text, pageable).toList();
         return ItemMapper.listItemToDtoList(foundItems);
     }
 

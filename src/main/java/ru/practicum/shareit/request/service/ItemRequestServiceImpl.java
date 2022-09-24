@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.util.PaginationUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,7 +57,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestWithItemsDto> getItemRequestAll(int from, int size, long userId) {
         checkUserExists(userId);
-        Pageable pageable = PageRequest.of(from / size, size, sort);
+        Pageable pageable = PaginationUtil.getPageable(from, size, sort);
         return itemRequestRepository.findAll(pageable).stream()
                 .filter(itemRequest -> itemRequest.getRequester().getId() != userId)
                 .map(itemRequest -> ItemRequestMapper.toItemRequestWithItemsDto(itemRequest,

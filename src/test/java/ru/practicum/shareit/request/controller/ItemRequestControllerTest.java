@@ -35,12 +35,12 @@ class ItemRequestControllerTest {
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     @MockBean
-    ItemRequestService itemRequestService;
+    private ItemRequestService itemRequestService;
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
 
     @Test
-    void createItemRequestPost200() throws Exception {
+    void shouldReturn200onPostCreateItemRequest() throws Exception {
         ItemRequestPostDto dto = getItemRequestPostDto();
         when(itemRequestService.createItemRequest(anyLong(), any(ItemRequestPostDto.class)))
                 .thenReturn(getItemRequestPostResponseDto(dto));
@@ -56,7 +56,7 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    void getItemRequestPost200() throws Exception {
+    void shouldReturn200onPostGetItemRequest() throws Exception {
         ItemRequestWithItemsDto dto = getItemRequestWithItemsDto();
         when(itemRequestService.getItemRequest(anyLong(), anyLong()))
                 .thenReturn(getItemRequestWithItemsDto());
@@ -73,7 +73,7 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    void getItemRequestAllPost200() throws Exception {
+    void shouldReturn200onPostGetItemRequestAll() throws Exception {
         ItemRequestWithItemsDto dto = getItemRequestWithItemsDto();
         when(itemRequestService.getItemRequestAll(anyInt(), anyInt(), anyLong()))
                 .thenReturn(Collections.singletonList(dto));
@@ -90,7 +90,7 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    void getItemRequestAllByUserIdPost200() throws Exception {
+    void shouldReturn200onPostGetItemRequestAllByUserId() throws Exception {
         ItemRequestWithItemsDto dto = getItemRequestWithItemsDto();
         when(itemRequestService.getItemRequestAllByUserId(anyLong()))
                 .thenReturn(Collections.singletonList(dto));

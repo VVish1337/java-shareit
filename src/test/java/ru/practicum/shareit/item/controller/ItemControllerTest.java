@@ -34,9 +34,8 @@ public class ItemControllerTest {
     @Autowired
     private MockMvc mvc;
 
-
     @Test
-    void itemCreatePost200andReturnItem() throws Exception {
+    void shouldReturn200OnPostCreateItem() throws Exception {
         ItemDto itemDto = getItemDto();
         ItemDto responseItemDto = getResponseItemDto();
         when(itemService.saveItem(anyLong(), any(ItemDto.class)))
@@ -54,7 +53,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void itemUpdatePost200andReturnUpdatedItem() throws Exception {
+    void shouldReturn200onPostItemUpdate() throws Exception {
         ItemDto itemDto = getItemDto();
         itemDto.setName("update");
         ItemDto updatedItem = getResponseItemDto();
@@ -74,7 +73,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void itemGetItemByIdPost200AndReturnItem() throws Exception {
+    void shouldReturn200onPostGetById() throws Exception {
         itemService.saveItem(1L, getItemDto());
         ItemDto itemResponse = getResponseItemDto();
         when(itemService.getItemById(anyLong(), anyLong()))
@@ -93,7 +92,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void itemGetItemListPost200AndReturnList() throws Exception {
+    void shouldReturn200onPostGetItemList() throws Exception {
         itemService.saveItem(1L, getItemDto());
         ItemDto itemResponse = getResponseItemDto();
         ArrayList<ItemDto> list = new ArrayList<>();
@@ -115,7 +114,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void createCommentPost200AndReturnCommentDto() throws Exception {
+    void shouldReturn200onPostCreateComment() throws Exception {
         CreateCommentDto inputCommentDto = new CreateCommentDto("some text");
         CommentDto responseCommentDto = getResponseCommentDto(inputCommentDto);
         when(itemService.createComment(any(CreateCommentDto.class), any(Long.class), any(Long.class)))
@@ -133,7 +132,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void searchItemPost200() throws Exception {
+    void shouldReturn200onPostSearchItem() throws Exception {
         when(itemService.searchItem(anyString(), anyInt(), anyInt()))
                 .thenReturn(new ArrayList<>());
         mvc.perform(get("/items/search")

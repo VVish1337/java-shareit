@@ -2,6 +2,9 @@ package ru.practicum.shareit.request.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -21,27 +24,23 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class ItemRequestServiceTest {
-
+    @Mock
     private UserRepository userRepository;
+    @Mock
     private ItemRepository itemRepository;
-    private ItemRequestService requestService;
+    @InjectMocks
+    private ItemRequestServiceImpl requestService;
+    @Mock
     private ItemRequestRepository requestRepository;
     private User user;
     private ItemRequest itemRequest;
 
     @BeforeEach
     public void beforeEach() {
-        userRepository = mock(UserRepository.class);
-        itemRepository = mock(ItemRepository.class);
-        requestRepository = mock(ItemRequestRepository.class);
-        requestService = new ItemRequestServiceImpl(
-                requestRepository,
-                userRepository,
-                itemRepository);
         user = new User(1L, "name", "user@gmail.com");
         itemRequest = new ItemRequest(1L, "description", user, LocalDateTime.now());
     }
@@ -98,7 +97,6 @@ class ItemRequestServiceTest {
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals(itemRequest.getDescription(), result.getDescription());
-        ;
         assertNotNull(result.getItems());
         assertTrue(result.getItems().isEmpty());
     }

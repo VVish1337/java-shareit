@@ -36,7 +36,7 @@ public class UserControllerTest {
     private MockMvc mvc;
 
     @Test
-    void createUserPost200() throws Exception {
+    void shouldReturn200onPostCreateUser() throws Exception {
         when(userService.save(any(UserDto.class)))
                 .thenReturn(user);
         mvc.perform(post("/users")
@@ -51,7 +51,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void updateUserPost200() throws Exception {
+    void shouldReturn200onPostUpdateUser() throws Exception {
         createUser(user);
         User updateUser = new User(1L, "userUpdate", "user2@user.com");
         when(userService.updateUser(anyLong(), any(UserDto.class)))
@@ -68,7 +68,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getUserByIdPost200() throws Exception {
+    void shouldReturn200onPostGetUserById() throws Exception {
         createUser(user);
         when(userService.getUserById(anyLong()))
                 .thenReturn(user);
@@ -84,7 +84,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getAllUsersPost200andReturnUsersList() throws Exception {
+    void shouldReturn200onPostGetUsersList() throws Exception {
         createUser(user);
         User user2 = new User(2L, "user2", "user2@mail.ru");
         createUser(user2);
@@ -106,7 +106,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void deleteUserPost200() throws Exception {
+    void shouldReturn200onPostDeleteUser() throws Exception {
         mvc.perform(delete("/users/1"))
                 .andExpect(status().isOk());
     }
