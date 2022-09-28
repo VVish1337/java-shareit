@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,41 +14,41 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b from Booking b where b.booker.id = ?1 and b.status = ?2 order by b.start asc")
-    List<Booking> findRejectedBookings(Long userId, BookingStatus status);
+    Page<Booking> findRejectedBookings(Long userId, BookingStatus status, Pageable pageable);
 
     @Query("select b from Booking b " +
             "where b.booker.id = ?1 " +
             "and b.start < ?2 " +
             "and b.end < ?2 " +
             "order by b.start asc ")
-    List<Booking> findPastBookings(Long userId, LocalDateTime now);
+    Page<Booking> findPastBookings(Long userId, LocalDateTime now,Pageable pageable);
 
     @Query("select b from Booking b " +
             "where b.item.owner.id = ?1 " +
             "and b.start < ?2 " +
             "and b.end > ?2 " +
             "order by b.start asc")
-    List<Booking> findBookingsByItemOwnerCurrent(Long userId, LocalDateTime now);
+    Page<Booking> findBookingsByItemOwnerCurrent(Long userId, LocalDateTime now,Pageable pageable);
 
     @Query("select b from Booking b " +
             "where b.booker.id = ?1 " +
             "and b.start < ?2 " +
             "and b.end > ?2 " +
             "order by b.start asc ")
-    List<Booking> findByBookerIdCurrent(Long userId, LocalDateTime now);
+    Page<Booking> findByBookerIdCurrent(Long userId, LocalDateTime now,Pageable pageable);
 
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.status = ?2 order by b.start asc")
-    List<Booking> findRejectedBookingsByOwner(Long userId, BookingStatus rejected);
+    Page<Booking> findRejectedBookingsByOwner(Long userId, BookingStatus rejected,Pageable pageable);
 
-    List<Booking> findByBookerIdAndStartIsAfter(Long userId, LocalDateTime now, Sort sort);
+    Page<Booking> findByBookerIdAndStartIsAfter(Long userId, LocalDateTime now, Pageable pageable);
 
-    List<Booking> findByBookerId(Long userId, Sort sort);
+    Page<Booking> findByBookerId(Long userId, Pageable pageable);
 
-    List<Booking> findByItemOwnerId(Long userId, Sort sort);
+    Page<Booking> findByItemOwnerId(Long userId, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndStartIsAfter(Long userId, LocalDateTime now, Sort sort);
+    Page<Booking> findByItemOwnerIdAndStartIsAfter(Long userId, LocalDateTime now, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndEndIsBefore(Long userId, LocalDateTime now, Sort sort);
+    Page<Booking> findByItemOwnerIdAndEndIsBefore(Long userId, LocalDateTime now, Pageable pageable);
 
     List<Booking> findByItemIdAndEndBefore(Long itemId, LocalDateTime now, Sort sort);
 

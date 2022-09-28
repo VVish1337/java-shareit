@@ -9,9 +9,12 @@ import ru.practicum.shareit.item.marker.Create;
 import ru.practicum.shareit.item.marker.Update;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
+@Validated
 @RestController
 @RequestMapping("/items")
 public class ItemController {
@@ -29,13 +32,17 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getItemList(@RequestHeader(USER_ID_HEADER) long userId) {
-        return itemService.getItemList(userId);
+    public List<ItemDto> getItemList(@RequestHeader(USER_ID_HEADER) long userId,
+                                     @Min(0) @RequestParam(defaultValue = "0") int from,
+                                     @PositiveOrZero @RequestParam(defaultValue = "10") int size) {
+        return itemService.getItemList(userId,from,size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text) {
-        return itemService.searchItem(text);
+    public List<ItemDto> searchItem(@RequestParam String text,
+                                    @Min(0) @RequestParam(defaultValue = "0") int from,
+                                    @PositiveOrZero @RequestParam(defaultValue = "10") int size) {
+        return itemService.searchItem(text,from,size);
     }
 
     @PostMapping
