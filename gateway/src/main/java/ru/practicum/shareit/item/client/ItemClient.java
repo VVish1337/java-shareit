@@ -35,7 +35,7 @@ public class ItemClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return get("?state={state}&from={from}&size={size}",userId,parameters);
+        return get("?from={from}&size={size}",userId,parameters);
     }
 
     public ResponseEntity<Object> searchItem(long userId,String text, int from, int size) {
@@ -45,7 +45,7 @@ public class ItemClient extends BaseClient {
                 "size", size
 
         );
-        return get("/search?state={state}&from={from}&size={size}",userId,parameters);
+        return get("/search?text={text}&from={from}&size={size}",userId,parameters);
     }
 
     public ResponseEntity<Object> saveItem(long userId, ItemDto itemDto) {

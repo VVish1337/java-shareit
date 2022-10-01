@@ -4,7 +4,6 @@ import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Table(name = "comments")
@@ -26,6 +25,5 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;
-    @NotNull
     private LocalDateTime created;
 }
