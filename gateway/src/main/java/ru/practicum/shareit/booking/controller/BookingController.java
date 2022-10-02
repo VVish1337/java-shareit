@@ -13,7 +13,7 @@ import ru.practicum.shareit.item.marker.Create;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.PositiveOrZero;
 
-@Controller
+@RestController
 @RequestMapping(path = "/bookings")
 @Slf4j
 @Validated
