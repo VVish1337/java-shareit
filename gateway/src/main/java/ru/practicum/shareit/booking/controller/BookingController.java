@@ -24,32 +24,6 @@ public class BookingController {
     private static final String DEFAULT_STATE_VALUE = "ALL";
     private final BookingClient bookingClient;
 
-
-//	@GetMapping
-//	public ResponseEntity<Object> getBookings(@RequestHeader("X-Sharer-User-Id") long userId,
-//			@RequestParam(name = "state", defaultValue = "all") String stateParam,
-//			@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-//			@Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-//		State state = State.from(stateParam)
-//				.orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
-//		log.info("Get booking with state {}, userId={}, from={}, size={}", stateParam, userId, from, size);
-//		return bookingClient.getBookings(userId, state, from, size);
-//	}
-//
-//	@PostMapping
-//	public ResponseEntity<Object> bookItem(@RequestHeader("X-Sharer-User-Id") long userId,
-//			@RequestBody @Valid BookingPostDto bookingDto) {
-//		log.info("Creating booking {}, userId={}", bookingDto, userId);
-//		return bookingClient.bookItem(userId, bookingDto);
-//	}
-//
-//	@GetMapping("/{bookingId}")
-//	public ResponseEntity<Object> getBooking(@RequestHeader("X-Sharer-User-Id") long userId,
-//			@PathVariable Long bookingId) {
-//		log.info("Get booking {}, userId={}", bookingId, userId);
-//		return bookingClient.getBooking(userId, bookingId);
-//	}
-
     @PostMapping
     public ResponseEntity<Object> addBooking(@RequestHeader(USER_ID_HEADER) long userId,
                                              @RequestBody @Validated(Create.class) BookingPostDto bookingDto) {
