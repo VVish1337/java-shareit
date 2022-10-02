@@ -38,7 +38,7 @@ public class BookingClient extends BaseClient {
         Map<String, Object> parameters = Map.of(
                 "approved", approved
         );
-        return patch("/" + bookingId + "?approved={approved}", userId, parameters, null);
+        return patch("/" + bookingId + "?approved={approved}", userId, parameters);
     }
 
     public ResponseEntity<Object> findAllBookings(String state,

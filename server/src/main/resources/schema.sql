@@ -47,4 +47,3 @@ CREATE TABLE IF NOT EXISTS comments
     created      TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     CONSTRAINT pk_comments PRIMARY KEY (comment_id)
 );
-
