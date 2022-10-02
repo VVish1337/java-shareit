@@ -31,12 +31,14 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<Object> addBooking(@RequestHeader(USER_ID_HEADER) long userId,
                                              @RequestBody @Validated(Create.class) BookingPostDto bookingDto) {
+        log.info("Creating booking {}, userId={}", bookingDto, userId);
         return bookingClient.addBooking(userId, bookingDto);
     }
 
     @GetMapping("{bookingId}")
     public ResponseEntity<Object> getBooking(@PathVariable Long bookingId,
                                              @RequestHeader(USER_ID_HEADER) Long userId) {
+        log.info("Get booking {}, userId={}", bookingId, userId);
         return bookingClient.getBooking(bookingId, userId);
     }
 
@@ -44,6 +46,7 @@ public class BookingController {
     public ResponseEntity<Object> updateBookingStatus(@PathVariable Long bookingId,
                                                       @RequestParam Boolean approved,
                                                       @RequestHeader(USER_ID_HEADER) Long userId) {
+        log.info("Update booking {}, approved={}. userId={}", bookingId, approved, userId);
         return bookingClient.updateBookingStatus(bookingId, approved, userId);
     }
 
@@ -52,6 +55,7 @@ public class BookingController {
                                                   @RequestHeader(USER_ID_HEADER) Long userId,
                                                   @RequestParam(defaultValue = "0") @Min(0) int from,
                                                   @RequestParam(defaultValue = "10") @PositiveOrZero int size) {
+        log.info("Get booking with state {}, userId={}, from={}, size={}", state, userId, from, size);
         return bookingClient.findAllBookings(state, userId, from, size);
     }
 
@@ -60,6 +64,7 @@ public class BookingController {
                                                      @RequestHeader(USER_ID_HEADER) Long userId,
                                                      @RequestParam(defaultValue = "0") @Min(0) int from,
                                                      @RequestParam(defaultValue = "10") @PositiveOrZero int size) {
+        log.info("Get bookings owner with state{}, userId={}, from={}, size={}", state, userId, from, size);
         return bookingClient.findAllByItemOwner(state, userId, from, size);
     }
 }
