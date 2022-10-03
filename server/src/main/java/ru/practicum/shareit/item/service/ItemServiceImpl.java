@@ -106,7 +106,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItem(String text, int from, int size) {
-        Pageable pageable = PaginationUtil.getPageable(from, size, Sort.unsorted());
+        Pageable pageable = PaginationUtil.getPageable(from, size, Sort.by("id"));
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
