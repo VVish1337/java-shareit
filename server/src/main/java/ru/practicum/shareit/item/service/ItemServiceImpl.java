@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemList(long userId, int from, int size) {
-        Pageable pageable = PaginationUtil.getPageable(from, size, Sort.unsorted());
+        Pageable pageable = PaginationUtil.getPageable(from, size, Sort.by("id").ascending());
         return ItemMapper.listItemToDtoList(itemRepository.findAll(pageable).stream()
                         .filter(item -> item.getOwner().getId().equals(userId))
                         .collect(Collectors.toList())).stream()
@@ -106,7 +106,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItem(String text, int from, int size) {
-        Pageable pageable = PaginationUtil.getPageable(from, size, Sort.by("id").ascending());
+        Pageable pageable = PaginationUtil.getPageable(from, size, Sort.unsorted());
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
