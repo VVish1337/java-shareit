@@ -20,10 +20,4 @@ public class ErrorHandler {
     public ErrorResponse handle(IllegalArgumentException e) {
         return new ErrorResponse("IllegalArgumentException: ", e.getMessage());
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handle(Throwable e) {
-        return new ErrorResponse("INTERNAL_SERVER_ERROR: ", e.getMessage());
-    }
 }
